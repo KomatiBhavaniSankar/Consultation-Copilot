@@ -15,6 +15,8 @@ import os
 import re
 import secrets
 import tempfile
+import threading
+import time
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
@@ -43,8 +45,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = Path(os.getenv("FRONTEND_DIR", BASE_DIR / "frontend"))
 STATIC_DIR = Path(os.getenv("STATIC_DIR", BASE_DIR / "static"))   # holds the built tailwind.css
 SQLITE_PATH = os.getenv("SQLITE_PATH", str(BASE_DIR / "records.db"))   # patient records (the permanent record book)
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
-WHISPER_LANG = os.getenv("WHISPER_LANG", "en")   # "auto" to auto-detect
+STT_LANG_HINT = os.getenv("STT_LANG_HINT", "English")   # e.g. Hindi, Kannada, or "auto"
 MAX_ROUNDS = int(os.getenv("MAX_RETRIEVAL_ROUNDS", "2"))          # 1 = never rewrite a weak query, 2 = one rewrite
 FAST_TIMEOUT = float(os.getenv("EMERGENCY_LLM_TIMEOUT", "25"))    # seconds the emergency modes wait for the model
 APP_USER = os.getenv("APP_USER", "admin")
@@ -86,48 +87,48 @@ def slim(rec: dict) -> dict:
 
 
 # ============================================================
-# 4. Speech-to-text: Google Cloud if configured, else local Whisper
+# 4. Speech-to-text: Gemini (same GOOGLE_API_KEY, no local model)
 # ============================================================
 
-_whisper = None
+_genai_client = None
+STT_MODELS = [m.strip() for m in os.getenv("STT_MODEL", os.getenv("GEMINI_MODELS", "gemini-3.5-flash")).split(",") if m.strip()]
+STT_INLINE_LIMIT = 15 * 1024 * 1024   # larger recordings go through the Files API
 
 
-def stt_google(path: str) -> str:
-    from google.cloud import speech
-    client = speech.SpeechClient()
-    with open(path, "rb") as f:
-        audio = speech.RecognitionAudio(content=f.read())
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
-        language_code="en-US",
-        model="medical_conversation",
-        enable_automatic_punctuation=True,
-        audio_channel_count=1,
-    )
-    response = client.long_running_recognize(config=config, audio=audio).result(timeout=300)
-    return " ".join(r.alternatives[0].transcript for r in response.results if r.alternatives).strip()
-
-
-def stt_whisper(path: str) -> str:
-    global _whisper
-    from faster_whisper import WhisperModel
-    if _whisper is None:
-        _whisper = WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8")
-    lang = None if WHISPER_LANG == "auto" else WHISPER_LANG
-    segments, _ = _whisper.transcribe(path, language=lang, vad_filter=True)
-    return " ".join(s.text.strip() for s in segments).strip()
+def _stt_prompt() -> str:
+    hint = "" if STT_LANG_HINT.lower() == "auto" else f" The speech is in {STT_LANG_HINT}."
+    return ("Transcribe this audio exactly as spoken. If more than one person speaks, start each turn with "
+            "'Doctor:' / 'Patient:' (or 'Speaker 1:' / 'Speaker 2:' if unclear). Keep medical terms, drug names, "
+            "doses and numbers exact. If there is no speech, return nothing. Return only the transcript." + hint)
 
 
 def transcribe(path: str) -> str:
-    if os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
+    """Audio file (mono 16 kHz WAV from the web page) -> text, using Gemini."""
+    global _genai_client
+    from google import genai
+    from google.genai import types
+    if _genai_client is None:
+        _genai_client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
+    client = _genai_client
+
+    if os.path.getsize(path) > STT_INLINE_LIMIT:
+        audio = client.files.upload(file=path, config={"mime_type": "audio/wav"})
+        while audio.state and audio.state.name == "PROCESSING":
+            time.sleep(2)
+            audio = client.files.get(name=audio.name)
+    else:
+        with open(path, "rb") as f:
+            audio = types.Part.from_bytes(data=f.read(), mime_type="audio/wav")
+
+    last_error = None
+    for model in STT_MODELS:
         try:
-            text = stt_google(path)
-            if text:
-                return text
+            resp = client.models.generate_content(model=model, contents=[_stt_prompt(), audio])
+            return (resp.text or "").strip()
         except Exception as error:
-            print(f"[stt] Google failed, using Whisper: {error}")
-    return stt_whisper(path)
+            print(f"[stt] {model} failed: {type(error).__name__}: {str(error)[:200]}")
+            last_error = error
+    raise RuntimeError(f"Speech-to-text failed on every Gemini model: {last_error}")
 
 
 # ============================================================
@@ -1471,8 +1472,6 @@ mode_app = mode_graph.compile()
 # 9. FastAPI
 # ============================================================
 
-if os.getenv("AUTO_INGEST", "true").lower() == "true":
-    ingest_all()   # embeds only new or changed files, so restarts are quick
 
 
 def _rebuild_case_index():
@@ -1490,8 +1489,18 @@ def _rebuild_case_index():
     print(f"[kb] rebuilt the case index from {len(rows)} saved consultations")
 
 
-if USE_POSTGRES and os.getenv("REBUILD_CASE_INDEX_ON_START", "true").lower() == "true":
-    _rebuild_case_index()
+def _startup_indexing():
+    """Runs in the background so uvicorn opens its port at once (Render fails deploys that bind too late)."""
+    try:
+        if os.getenv("AUTO_INGEST", "true").lower() == "true":
+            ingest_all()   # embeds only new or changed files
+        if USE_POSTGRES and os.getenv("REBUILD_CASE_INDEX_ON_START", "true").lower() == "true":
+            _rebuild_case_index()
+    except Exception as error:
+        print(f"[startup] indexing failed: {type(error).__name__}: {str(error)[:300]}")
+
+
+threading.Thread(target=_startup_indexing, daemon=True, name="startup-indexing").start()
 
 app = FastAPI(title="Consultation Copilot", version="5.0.0")
 STATIC_DIR.mkdir(parents=True, exist_ok=True)

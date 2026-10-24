@@ -27,3 +27,10 @@ __pycache__
 .ipynb_checkpoints
 .DS_Store
 Thumbs.db
+
+.env
+chroma_db/
+__pycache__/
+*.pyc
+.git/
+node_modules/
