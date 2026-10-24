@@ -11,7 +11,6 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from bs4 import BeautifulSoup
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -28,7 +27,7 @@ if not EMBEDDING_MODEL.startswith("models/"):
 RETRIEVAL_K = int(os.getenv("RETRIEVAL_K", "4"))
 MANIFEST = Path(DB_DIR) / "ingest_manifest.json"
 TEXT_EXT = {".txt", ".md", ".json"}
-HTML_EXT = {".html", ".htm"}
+
 
 if not os.getenv("GOOGLE_API_KEY"):
     raise RuntimeError("GOOGLE_API_KEY is not set. It is required for Gemini embeddings.")
@@ -53,27 +52,14 @@ def _simple(meta: dict) -> dict:
 
 
 def load_file(path: Path) -> list:
-    ext = path.suffix.lower()
-    if ext == ".pdf":
-        from pypdf import PdfReader
-        docs = []
-        for i, page in enumerate(PdfReader(str(path)).pages):
-            text = page.extract_text() or ""
-            if text.strip():
-                docs.append(Document(page_content=text, metadata={"source": str(path), "page": i}))
-        return docs
     raw = path.read_text(encoding="utf-8", errors="ignore")
-    if ext in HTML_EXT:
-        soup = BeautifulSoup(raw, "html.parser")
-        for tag in soup(["script", "style", "nav", "footer", "noscript", "iframe", "form"]):
-            tag.decompose()
-        raw = soup.get_text("\n", strip=True)
     return [Document(page_content=raw, metadata={"source": str(path)})] if raw.strip() else []
 
 
 def _skip(p: Path) -> bool:
     n = p.name.lower()
-    return n.startswith(("_", ".", "readme")) or p.suffix.lower() not in TEXT_EXT | HTML_EXT | {".pdf"}
+    return n.startswith(("_", ".", "readme")) or p.suffix.lower() not in TEXT_EXT
+
 
 
 def _sha(path: Path) -> str:

@@ -11,8 +11,6 @@ langchain-chroma
 chromadb
 langgraph
 google-genai
-pypdf
-beautifulsoup4
 requests
 reportlab
 psycopg[binary,pool]
