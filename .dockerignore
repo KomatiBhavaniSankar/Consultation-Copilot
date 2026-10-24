@@ -34,3 +34,31 @@ __pycache__/
 *.pyc
 .git/
 node_modules/
+
+# secrets
+.env
+.env.*
+secrets/
+
+# local data
+chroma_db/
+records.db
+*.db
+
+# git and python junk
+.git/
+.gitignore
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+
+# docs and tooling not needed in the image
+Dockerfile
+docker-compose.yml
+.dockerignore
+*.md
+!knowledge/**/*.md
+.vscode/
+.idea/
