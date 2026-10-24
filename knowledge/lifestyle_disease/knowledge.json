@@ -1,0 +1,204 @@
+{
+  "clinical_safety": {
+    "purpose": "Clinical decision support and retrieval reference; not a substitute for a clinician, local protocols, or emergency services.",
+    "audience_note": "Separate lay first aid from clinician-only interventions. Medication lists are not patient-specific prescriptions.",
+    "medication_guardrails": [
+      "Confirm patient identity, age, weight when relevant, allergies, pregnancy status, renal/hepatic function, current medicines, contraindications, and local formulary.",
+      "Use current institutional protocols and product labels for exact dosing, preparation, route, monitoring, and contraindications.",
+      "Do not delay emergency transport, imaging, reperfusion, CPR, or specialist review to search this knowledge base.",
+      "Do not give oral food, drink, or medicines to a person with possible stroke until swallowing safety is assessed.",
+      "Medication use in children, pregnancy, older adults, renal impairment, and critical illness requires extra caution and clinician oversight."
+    ],
+    "review_status": "Draft reference compiled from the sources listed in each file. Must be reviewed and signed off by the institution's clinical lead before clinical deployment.",
+    "last_reviewed": "2026-10-23",
+    "jurisdiction_note": "Designed as a general reference with India-relevant emergency number context; confirm local emergency numbers, referral pathways, drug availability, and national guidelines."
+  },
+  "schema_version": "1.0.0",
+  "folder": "lifestyle_disease",
+  "display_name": "Lifestyle disease: diabetes, blood pressure, cholesterol and prevention",
+  "scope": [
+    "Diabetes diagnosis and classification",
+    "Type 2 diabetes medicine selection",
+    "Lifestyle interventions and monitoring",
+    "Hypertension and cardiovascular risk overview"
+  ],
+  "diagnosis": {
+    "diabetes_adult_criteria": [
+      {
+        "test": "HbA1c",
+        "diabetes_threshold": "6.5% or higher",
+        "prediabetes_range": "5.7–6.4%",
+        "notes": "Use a standardized laboratory method; conditions affecting red cell turnover or haemoglobin may make HbA1c unreliable."
+      },
+      {
+        "test": "Fasting plasma glucose",
+        "diabetes_threshold": "126 mg/dL (7.0 mmol/L) or higher after at least 8 hours fasting",
+        "prediabetes_range": "100–125 mg/dL (ADA criteria)"
+      },
+      {
+        "test": "75-g oral glucose tolerance test, 2-hour plasma glucose",
+        "diabetes_threshold": "200 mg/dL (11.1 mmol/L) or higher",
+        "prediabetes_range": "140–199 mg/dL (ADA criteria)"
+      },
+      {
+        "test": "Random plasma glucose",
+        "diabetes_threshold": "200 mg/dL (11.1 mmol/L) or higher with classic hyperglycaemia symptoms or hyperglycaemic crisis",
+        "notes": "Without unequivocal hyperglycaemia, confirm with repeat testing."
+      }
+    ],
+    "confirmation": "In the absence of unequivocal hyperglycaemia, diagnosis generally requires two abnormal results from the same or separate tests. Pregnancy uses separate gestational diabetes criteria and local antenatal pathways.",
+    "baseline_assessment": [
+      "History: symptoms, family history, pregnancy history, diet/activity, smoking, alcohol, sleep, medicines including steroids, and cardiovascular/renal history",
+      "Vitals: blood pressure, weight/BMI, waist circumference as appropriate",
+      "Labs: HbA1c or plasma glucose, lipid profile, creatinine/eGFR, urine albumin-creatinine ratio; liver tests and other tests based on context",
+      "Screen for complications: retinal examination, foot/neuropathy exam, kidney assessment, cardiovascular risk, dental and psychosocial needs"
+    ],
+    "urgent_red_flags": [
+      "Vomiting, abdominal pain, deep rapid breathing, dehydration, fruity breath or confusion: possible diabetic ketoacidosis/hyperglycaemic crisis",
+      "Severe hypoglycaemia, seizure, unconsciousness or inability to swallow: emergency response; do not give oral food/drink to an unconscious person",
+      "Chest pain, stroke signs, severe breathlessness or acute confusion require emergency evaluation"
+    ]
+  },
+  "care_pathway": [
+    {
+      "step": "Shared assessment and goals",
+      "actions": [
+        "Agree individualized glucose, blood pressure, lipid, weight and quality-of-life goals.",
+        "Review affordability, access, cultural food patterns, health literacy, pregnancy plans, frailty and patient preferences."
+      ]
+    },
+    {
+      "step": "Lifestyle and prevention",
+      "actions": [
+        "Aim for at least 150 minutes/week moderate activity where medically appropriate plus strength work twice weekly.",
+        "Prefer minimally processed high-fibre foods, vegetables, pulses, whole grains, nuts and suitable portions; reduce sugary drinks and excess refined carbohydrates.",
+        "Support sustainable weight reduction when indicated, smoking cessation, sleep regularity and stress support.",
+        "Foot care, vaccines and regular eye/kidney screening according to local guidelines."
+      ]
+    },
+    {
+      "step": "Medication choice",
+      "actions": [
+        "For type 2 diabetes, select medicines based on glycaemic efficacy, cardiovascular disease, heart failure, chronic kidney disease, weight goals, hypoglycaemia risk, tolerability, cost and access.",
+        "Use GLP-1 receptor agonists and/or SGLT2 inhibitors with demonstrated benefit when indicated for cardiovascular/renal/heart failure risk, even when glucose is near target, according to the current guideline.",
+        "Insulin is essential in type 1 diabetes and may be needed in type 2 diabetes with severe symptomatic hyperglycaemia or crisis.",
+        "Reassess treatment, adherence, adverse effects and targets regularly."
+      ]
+    },
+    {
+      "step": "Monitoring",
+      "actions": [
+        "HbA1c commonly every 3 months when changing therapy or not at goal, and about every 6 months when stable; individualize.",
+        "Check renal function and urine albumin at least annually in diabetes, more often if abnormal or medicines require it.",
+        "Assess blood pressure, lipids, weight, hypoglycaemia, feet and eye screening at recommended intervals."
+      ]
+    }
+  ],
+  "medicines": [
+    {
+      "generic_name": "Metformin",
+      "class": "Biguanide",
+      "role": "Common glucose-lowering option for type 2 diabetes; choice depends on renal function, tolerance and comorbidities.",
+      "safety": [
+        "Gastrointestinal effects are common; slow titration or extended-release may improve tolerance.",
+        "Avoid when eGFR is below 30 mL/min/1.73 m²; review kidney function and acute illness risks.",
+        "Consider vitamin B12 monitoring during long-term use."
+      ]
+    },
+    {
+      "generic_name": "SGLT2 inhibitors (e.g., empagliflozin, dapagliflozin)",
+      "class": "SGLT2 inhibitor",
+      "role": "Important guideline-supported class for selected people with type 2 diabetes, heart failure or chronic kidney disease; agent choice depends on indication and renal function.",
+      "safety": [
+        "Counsel about genital fungal infections, volume depletion and rare euglycaemic ketoacidosis.",
+        "Use sick-day/perioperative withholding instructions from current product label and local protocol.",
+        "Not a substitute for insulin in type 1 diabetes; ketoacidosis risk must be considered."
+      ]
+    },
+    {
+      "generic_name": "GLP-1 receptor agonists (e.g., semaglutide, dulaglutide, liraglutide)",
+      "class": "GLP-1 receptor agonist",
+      "role": "Guideline-supported glucose-lowering and weight-management options; selected agents have cardiovascular benefit and some kidney outcome evidence.",
+      "safety": [
+        "Nausea, vomiting and other gastrointestinal effects can occur; use product-specific titration.",
+        "Assess gallbladder/pancreatitis history and other product-specific cautions.",
+        "Pregnancy planning and peri-procedural management require clinician review."
+      ]
+    },
+    {
+      "generic_name": "Dual GIP/GLP-1 receptor agonist (tirzepatide)",
+      "class": "Dual incretin agonist",
+      "role": "High-efficacy glucose and weight-management option for selected adults where approved and appropriate.",
+      "safety": "Requires clinician assessment of contraindications, gastrointestinal tolerance, concomitant medicines and local regulatory status."
+    },
+    {
+      "generic_name": "Insulin",
+      "class": "Insulin therapy",
+      "role": "Required for type 1 diabetes and used for selected type 2 diabetes, pregnancy, severe hyperglycaemia or acute metabolic decompensation.",
+      "safety": [
+        "Dosing is individualized; hypoglycaemia can be life-threatening.",
+        "Teach glucose monitoring, injection technique, storage, sick-day rules and hypoglycaemia treatment.",
+        "Do not stop basal insulin in type 1 diabetes without urgent specialist advice."
+      ]
+    },
+    {
+      "generic_name": "ACE inhibitor or ARB (examples vary by formulary)",
+      "class": "Antihypertensive / renal risk management",
+      "role": "May be indicated for hypertension with albuminuria or other specific cardiovascular/renal indications.",
+      "safety": "Monitor potassium and renal function; contraindicated in pregnancy. Do not combine ACE inhibitor plus ARB routinely."
+    },
+    {
+      "generic_name": "Statins (e.g., atorvastatin, rosuvastatin)",
+      "class": "Lipid-lowering",
+      "role": "Common cardiovascular risk-reduction medicines selected according to age, risk, established ASCVD and local guideline.",
+      "safety": "Review interactions, muscle symptoms, liver context and pregnancy considerations; prescribe based on overall risk, not a single cholesterol value alone."
+    }
+  ],
+  "current_medicine_landscape": {
+    "as_of": "2026-10-23",
+    "meaning": "Current guideline-emphasized medicine classes, not a verified sales or prescription-volume ranking.",
+    "notable_classes": [
+      "SGLT2 inhibitors for appropriate heart failure/CKD and cardiovascular-risk indications",
+      "GLP-1 receptor agonists for selected cardiovascular-risk and weight-management needs",
+      "Dual GIP/GLP-1 therapy (tirzepatide) for selected glucose/weight goals",
+      "Metformin and insulin remain important depending on clinical context"
+    ],
+    "selection_principle": "ADA Standards of Care 2026 emphasizes person-centred selection and cardiovascular, kidney, weight, hypoglycaemia, tolerability, cost and preference considerations; it does not mean one medicine is best for everyone."
+  },
+  "sources": [
+    {
+      "name": "American Diabetes Association (ADA)",
+      "title": "Standards of Care in Diabetes—2026: Pharmacologic Approaches to Glycemic Treatment",
+      "url": "https://diabetesjournals.org/care/article/49/Supplement_1/S183/163934/",
+      "year": 2026,
+      "type": "Clinical standard"
+    },
+    {
+      "name": "American Diabetes Association (ADA)",
+      "title": "Diagnosis and Classification of Diabetes: Standards of Care in Diabetes—2026",
+      "url": "https://diabetesjournals.org/care/issue/49/Supplement_1",
+      "year": 2026,
+      "type": "Clinical standard"
+    },
+    {
+      "name": "World Health Organization (WHO)",
+      "title": "Diagnosis and management of type 2 diabetes",
+      "url": "https://www.who.int/publications/i/item/9789240000000",
+      "year": 2020,
+      "type": "Guidance landing page; verify current national edition"
+    }
+  ],
+  "retrieval_keywords": [
+    "HbA1c",
+    "fasting plasma glucose",
+    "OGTT",
+    "metformin",
+    "SGLT2",
+    "GLP-1",
+    "tirzepatide",
+    "insulin",
+    "hypoglycaemia",
+    "kidney screening",
+    "lifestyle"
+  ]
+}

@@ -1,0 +1,47 @@
+name: consultation-copilot
+
+services:
+  app:
+    build: .
+    image: consultation-copilot:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+    ports:
+      - "8001:7860"
+    volumes:
+      - copilot_data:/var/lib/copilot
+      - ./knowledge:/app/knowledge:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["local-llm"]
+    restart: unless-stopped
+    volumes:
+      - ollama_models:/root/.ollama
+
+  caddy:
+    image: caddy:2
+    profiles: ["https"]
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  copilot_data:
+  ollama_models:
+  caddy_data:
+  caddy_config:

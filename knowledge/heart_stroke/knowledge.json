@@ -1,0 +1,160 @@
+{
+  "clinical_safety": {
+    "purpose": "Clinical decision support and retrieval reference; not a substitute for a clinician, local protocols, or emergency services.",
+    "audience_note": "Separate lay first aid from clinician-only interventions. Medication lists are not patient-specific prescriptions.",
+    "medication_guardrails": [
+      "Confirm patient identity, age, weight when relevant, allergies, pregnancy status, renal/hepatic function, current medicines, contraindications, and local formulary.",
+      "Use current institutional protocols and product labels for exact dosing, preparation, route, monitoring, and contraindications.",
+      "Do not delay emergency transport, imaging, reperfusion, CPR, or specialist review to search this knowledge base.",
+      "Do not give oral food, drink, or medicines to a person with possible stroke until swallowing safety is assessed.",
+      "Medication use in children, pregnancy, older adults, renal impairment, and critical illness requires extra caution and clinician oversight."
+    ],
+    "review_status": "Draft reference compiled from the sources listed in each file. Must be reviewed and signed off by the institution's clinical lead before clinical deployment.",
+    "last_reviewed": "2026-10-23",
+    "jurisdiction_note": "Designed as a general reference with India-relevant emergency number context; confirm local emergency numbers, referral pathways, drug availability, and national guidelines."
+  },
+  "schema_version": "1.0.0",
+  "folder": "heart_stroke",
+  "display_name": "Stroke recognition and emergency response",
+  "scope": [
+    "Public stroke recognition",
+    "Prehospital handover",
+    "Hospital stroke assessment and reperfusion pathway"
+  ],
+  "triage": {
+    "recognition": "BE-FAST: sudden Balance loss, Eyes/vision change, Face droop, Arm weakness, Speech difficulty, Time to call emergency services. Other red flags include sudden severe headache, confusion, numbness, or trouble walking.",
+    "immediate_action": [
+      "Call emergency services immediately; note the last time the person was known to be well.",
+      "Do not give food, drink, aspirin or other oral medicines before clinical assessment.",
+      "Check breathing and responsiveness; if not breathing normally, begin CPR.",
+      "Tell the receiving team about anticoagulants, recent surgery/bleeding, baseline function and symptom timeline."
+    ],
+    "do_not": [
+      "Do not wait for symptoms to resolve; transient symptoms also need urgent assessment.",
+      "Do not give aspirin before brain imaging excludes haemorrhage.",
+      "Do not lower blood pressure rapidly unless directed by the stroke team."
+    ]
+  },
+  "diagnostic_process": [
+    {
+      "step": 1,
+      "name": "Stabilize and activate stroke pathway",
+      "details": [
+        "Airway, breathing, circulation; oxygen only if hypoxaemic per local protocol",
+        "Record exact last-known-well time, NIH Stroke Scale where trained, vitals and bedside glucose",
+        "Establish IV access; obtain bloods without delaying indicated imaging/treatment"
+      ]
+    },
+    {
+      "step": 2,
+      "name": "Urgent neuroimaging",
+      "details": [
+        "Non-contrast CT head to distinguish haemorrhage from ischaemia",
+        "CT angiography for suspected large-vessel occlusion; perfusion CT/MRI or MRI in selected extended-window cases",
+        "Imaging must not delay otherwise-indicated IV thrombolysis in eligible patients"
+      ]
+    },
+    {
+      "step": 3,
+      "name": "Eligibility and mimics",
+      "details": [
+        "Check glucose, anticoagulant use, recent surgery/bleeding, seizure, migraine and other mimics",
+        "Apply current institutional thrombolysis/thrombectomy checklist and specialist review"
+      ]
+    },
+    {
+      "step": 4,
+      "name": "Disposition and prevention",
+      "details": [
+        "Stroke-unit admission; dysphagia screen before oral intake",
+        "ECG/telemetry, vascular and cardiac work-up, rehabilitation assessment, secondary prevention plan"
+      ]
+    }
+  ],
+  "treatment_pathways": [
+    {
+      "condition": "Acute ischaemic stroke",
+      "time_window": "Usually within 4.5 hours for standard IV thrombolysis; selected patients may qualify outside this window using advanced imaging and specialist criteria.",
+      "interventions": [
+        "IV tenecteplase or alteplase for eligible patients under the current stroke protocol",
+        "Mechanical thrombectomy for selected large-vessel occlusion; some patients qualify up to 24 hours based on clinical/imaging criteria",
+        "Avoid routine antithrombotic administration until post-thrombolysis safety imaging/timing requirements are met"
+      ]
+    },
+    {
+      "condition": "Intracerebral haemorrhage",
+      "interventions": [
+        "Urgent stroke/neurosurgical/critical-care assessment",
+        "Manage anticoagulant reversal, blood pressure and intracranial complications using the relevant protocol",
+        "No thrombolytic or empiric aspirin"
+      ]
+    }
+  ],
+  "medicines": [
+    {
+      "generic_name": "Tenecteplase",
+      "class": "Fibrinolytic",
+      "role": "IV thrombolysis option for eligible acute ischaemic stroke patients under current 2026 AHA/ASA guidance and local protocol.",
+      "clinical_use": "Clinician-only; eligibility depends on timing, imaging, contraindications and protocol.",
+      "safety": "High-risk bleeding medicine. Do not use before haemorrhage is excluded or outside an approved stroke pathway."
+    },
+    {
+      "generic_name": "Alteplase",
+      "class": "Fibrinolytic",
+      "role": "Established IV thrombolysis option for eligible acute ischaemic stroke.",
+      "clinical_use": "Clinician-only; protocol-based dosing and eligibility checklist required.",
+      "safety": "Risk of intracranial and systemic bleeding; specialist oversight required."
+    },
+    {
+      "generic_name": "Aspirin",
+      "class": "Antiplatelet",
+      "role": "May be used for secondary prevention/acute ischaemic stroke after haemorrhage is excluded and timing requirements are met.",
+      "clinical_use": "Clinician-directed only after imaging and thrombolysis review.",
+      "safety": "Do not give to a suspected stroke patient at home or before imaging; may worsen intracranial bleeding."
+    },
+    {
+      "generic_name": "Antihypertensives (protocol-selected, e.g. labetalol or nicardipine)",
+      "class": "Blood pressure management",
+      "role": "Used selectively to meet thrombolysis thresholds or manage hypertensive emergencies.",
+      "clinical_use": "Titrated by trained clinicians with frequent BP monitoring.",
+      "safety": "Excessive BP reduction can impair cerebral perfusion; use stroke-specific thresholds."
+    }
+  ],
+  "current_medicine_landscape": {
+    "as_of": "2026-10-23",
+    "note": "The current AHA/ASA 2026 acute ischaemic stroke guideline names tenecteplase 0.25 mg/kg (maximum 25 mg) or alteplase 0.9 mg/kg as recommended IV thrombolytic options for eligible adults within 4.5 hours. This is a guideline update, not a market-sales or prescribing-frequency ranking.",
+    "commonly_guideline_supported_classes": [
+      "Tenecteplase or alteplase for eligible IV thrombolysis",
+      "Antiplatelet therapy after haemorrhage exclusion and according to timing",
+      "Protocol-directed BP agents where indicated",
+      "Anticoagulant reversal agents for selected haemorrhage cases"
+    ]
+  },
+  "sources": [
+    {
+      "name": "AHA/American Stroke Association (ASA)",
+      "title": "2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke",
+      "url": "https://www.ahajournals.org/doi/10.1161/STR.0000000000000513",
+      "year": 2026,
+      "type": "Guideline"
+    },
+    {
+      "name": "American Heart Association (AHA)",
+      "title": "2025 Guidelines for CPR and Emergency Cardiovascular Care",
+      "url": "https://professional.heart.org/en/science-news/2025-aha-guidelines-for-cpr-and-ecc",
+      "year": 2025,
+      "type": "Guideline"
+    }
+  ],
+  "retrieval_keywords": [
+    "BE-FAST",
+    "last known well",
+    "NIHSS",
+    "CT head",
+    "CTA",
+    "tenecteplase",
+    "alteplase",
+    "thrombectomy",
+    "dysphagia screen"
+  ]
+}

@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root { --accent: 166 25 46; --accent-soft: 250 235 237; }
+  body[data-mode="emergency"] { --accent: 196 18 47;  --accent-soft: 253 234 237; }
+  body[data-mode="critical"]  { --accent: 138 17 36;  --accent-soft: 248 228 232; }
+  body[data-mode="maternity"] { --accent: 148 41 59;  --accent-soft: 250 233 236; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { @apply bg-paper font-sans text-base leading-relaxed text-ink antialiased; }
+  :focus-visible { outline: 3px solid rgb(var(--accent)); outline-offset: 2px; }
+  input[type=text], textarea, select {
+    @apply mt-1 w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-base text-ink shadow-sm transition-colors placeholder:text-mute/70 focus:border-accent focus:outline-none;
+  }
+  textarea { @apply resize-y; }
+  label { @apply mt-2 block text-sm font-bold text-mute; }
+  h2 { @apply mb-2 text-base font-bold text-ink; }
+  h3 { @apply mb-1.5 mt-4 text-sm font-bold uppercase tracking-wide text-accent; }
+  ul { @apply my-1 list-disc pl-5; }
+  li { @apply my-1; }
+  table { @apply w-full border-collapse overflow-hidden rounded-xl border border-line bg-white; }
+  th, td { @apply border-b border-line px-3 py-2.5 text-left align-top; }
+  th { @apply bg-sand text-sm font-bold text-ink; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+}
+
+@layer components {
+  /* surfaces & interactive dropdown panes */
+  .pane { @apply rounded-2xl border border-line bg-white p-4 shadow-sm transition-all sm:p-5; }
+  details.pane { @apply mt-3.5 p-0 overflow-hidden; }
+  details.pane > summary {
+    @apply flex min-h-[58px] cursor-pointer select-none list-none items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-sand sm:px-5;
+  }
+  details.pane > summary::-webkit-details-marker { display: none; }
+  details.pane > summary::before, details.sub > summary::before {
+    content: ""; @apply h-2.5 w-2.5 flex-none -rotate-45 border-b-2 border-r-2 border-accent transition-transform duration-200;
+  }
+  details[open].pane { @apply border-accent/40 shadow-md; }
+  details[open].pane > summary { @apply border-b border-line bg-sand/70; }
+  details[open].pane > summary::before, details[open].sub > summary::before { @apply rotate-45; }
+  details.pane > summary h2 { @apply mb-0 text-base font-bold text-ink sm:text-[17px]; }
+  details.pane > summary small { @apply ml-auto text-right text-mute; }
+  details.pane > .body { @apply p-4 sm:p-5; }
+  details.sub { @apply mt-3 rounded-xl border border-line/80 bg-sand/50 px-3.5 py-2 text-sm; }
+  details.sub > summary { @apply flex min-h-[38px] cursor-pointer select-none list-none items-center gap-2.5 font-bold text-ink; }
+  details.sub > summary::-webkit-details-marker { display: none; }
+  .grid3 { @apply mt-3.5 flex flex-col gap-3.5; }
+  .two { @apply grid grid-cols-1 gap-3 md:grid-cols-2; }
+  .pred-grid { @apply grid grid-cols-1 gap-5 md:grid-cols-2; }
+  .scroll { @apply overflow-x-auto; }
+  table.small th, table.small td { @apply px-2.5 py-1.5 text-sm; }
+  tr.row { @apply cursor-pointer transition-colors hover:bg-sand; }
+  .detail { @apply bg-sand/70; }
+
+  /* buttons */
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-xl border border-accent bg-accent px-5 font-bold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.99] no-underline disabled:cursor-default disabled:opacity-45;
+  }
+  .btn.ghost { @apply border-line bg-sand text-accent hover:border-accent hover:bg-accent-soft; }
+  .btn-alarm {
+    @apply inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full bg-alarm px-4 font-bold text-white no-underline shadow-sm transition-transform active:scale-95;
+  }
+  .btn-alarm.alt { @apply bg-white text-alarm ring-2 ring-inset ring-alarm hover:bg-alarm-soft; }
+  .x { @apply min-h-[44px] min-w-[44px] rounded-lg text-2xl text-mute hover:bg-alarm-soft hover:text-alarm; }
+  .actions { @apply mt-4 flex flex-wrap items-center gap-2.5; }
+  #mic {
+    @apply grid h-16 w-16 flex-none place-items-center rounded-full bg-accent text-white shadow-md transition-transform hover:scale-105 active:scale-95;
+  }
+  #mic.rec { @apply bg-alarm; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 14px rgb(166 25 46 / .2); } }
+  .viewtab { @apply min-h-[40px] border-b-2 border-transparent px-3.5 text-mute transition-colors hover:text-ink; }
+  .viewtab.on { @apply border-accent font-bold text-accent; }
+  .tile {
+    @apply relative flex min-h-[64px] flex-col justify-center rounded-xl border-2 border-alarm bg-white py-3 pl-4 pr-10 text-left font-bold text-alarm shadow-sm transition-colors hover:bg-alarm-soft active:bg-alarm-soft;
+  }
+  .tile::after { content: "\203A"; @apply absolute right-4 top-1/2 -translate-y-1/2 text-2xl leading-none; }
+  .tile small { @apply font-normal text-mute; }
+
+  /* instant protocol card */
+  .proto { @apply mt-4 overflow-hidden rounded-2xl border-2 border-alarm bg-white shadow-md; }
+  .proto > header { @apply bg-alarm px-4 py-3 text-white sm:px-5; }
+  .proto > header h2 { @apply mb-0 text-lg text-white sm:text-xl; }
+  .proto > header p { @apply mt-0.5 text-sm text-white/90; }
+  .proto .calls { @apply flex flex-wrap gap-2 border-b border-line bg-alarm-soft px-4 py-3 sm:px-5; }
+  .proto .calls .btn-alarm { @apply min-h-[52px] flex-1 whitespace-nowrap px-3 text-lg sm:flex-none sm:px-8; }
+  .proto .inner { @apply px-4 pb-4 pt-2 sm:px-5; }
+  ol.steps { counter-reset: s; @apply m-0 list-none p-0; }
+  ol.steps > li { counter-increment: s; @apply relative my-0 border-b border-line py-3 pl-12 text-lg leading-snug last:border-b-0; }
+  ol.steps > li { @apply cursor-pointer select-none transition-colors hover:bg-sand/60; }
+  ol.steps > li.done { @apply text-mute line-through; }
+  ol.steps > li.done::before { content: "\2713"; @apply bg-ok; }
+  ol.steps > li::before { content: counter(s); @apply absolute left-0 top-3 grid h-8 w-8 place-items-center rounded-full bg-alarm text-base font-bold text-white; }
+  .proto, #triageBox .banner, #guid > * { animation: rise .25s ease-out both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+  .tog::before { content: "Open"; }
+  details[open] > summary .tog::before { content: "Close"; }
+  .tog { @apply rounded-full bg-paper px-3 py-1 text-xs font-bold tracking-wide text-accent transition-colors; }
+  details[open] > summary .tog { @apply bg-accent text-white; }
+  .grid3 > details.pane { margin-top: 0; }
+
+  /* use-case dropdown and mobile bottom bar */
+  .modebtn {
+    @apply flex min-h-[56px] w-full items-center justify-between gap-3 rounded-xl border-2 border-accent bg-sand/60 px-4 py-2 text-left transition-colors hover:bg-sand sm:max-w-md;
+  }
+  .modebtn::after { content: ""; @apply h-2.5 w-2.5 flex-none rotate-45 border-b-2 border-r-2 border-accent transition-transform; }
+  .modebtn[aria-expanded="true"]::after { transform: rotate(-135deg); }
+  .modebtn b, .modeitem b { @apply block text-base text-ink; }
+  .modebtn small, .modeitem small { @apply block text-sm font-normal text-mute; }
+  .modelist { @apply absolute left-0 right-0 top-full z-40 mt-1.5 overflow-hidden rounded-xl border border-line bg-white shadow-xl sm:right-auto sm:w-96; animation: rise .15s ease-out both; }
+  .modeitem { @apply block min-h-[60px] w-full border-b border-line px-4 py-2.5 text-left transition-colors last:border-b-0 hover:bg-accent-soft; }
+  .modeitem[aria-checked="true"] { @apply bg-accent-soft; }
+  .modeitem[aria-checked="true"] b { @apply text-accent; }
+  .botnav { @apply fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-white pb-[env(safe-area-inset-bottom)] shadow-lg; }
+  .botnav .viewtab { @apply min-h-[56px] flex-1 border-b-0 border-t-[3px] text-base; }
+
+  /* records as cards on a phone */
+  @media (max-width: 639px) {
+    table.recs { @apply border-0 bg-transparent; }
+    table.recs thead { display: none; }
+    table.recs, table.recs tbody, table.recs tr, table.recs td { display: block; width: 100%; }
+    table.recs tr.row { @apply mt-2 rounded-xl border border-line bg-white p-1 shadow-sm; }
+    table.recs td { @apply border-0 px-3 py-1; }
+    table.recs tr.row td:first-child { @apply text-sm text-mute; }
+    table.recs tr.detail { @apply mb-2 rounded-xl border border-line; }
+    table.recs tr.detail[hidden] { display: none; }
+    .proto .calls .btn-alarm { @apply w-full; }
+  }
+  .no-list li { @apply list-none; }
+
+  /* results */
+  .bubble { @apply my-1.5 max-w-[92%] rounded-xl px-3.5 py-2.5; }
+  .bubble b { @apply mb-0.5 block text-xs font-bold uppercase tracking-wider text-accent; }
+  .Doctor { @apply border border-accent/20 bg-accent-soft; }
+  .Patient { @apply ml-auto border border-line bg-sand; }
+  .convo { @apply max-h-[340px] overflow-auto pr-1; }
+  .med { @apply my-1.5 rounded-xl border border-line bg-sand/40 px-3 py-2; }
+  .med small, .past small { @apply block text-mute; }
+  .past { @apply my-2 rounded-r-xl border-l-[3px] border-accent bg-accent-soft/70 px-3 py-2; }
+  .empty { @apply text-mute; }
+  .note { @apply mt-3.5 text-xs text-mute; }
+  .mini { @apply my-1 text-sm text-mute; }
+  .chip { @apply ml-1 inline-block cursor-help rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-bold text-accent; }
+  .chip.warn { @apply bg-alarm-soft text-alarm; }
+  .chip.amber { @apply bg-amber-soft text-amber; }
+  .chip.mode { @apply ml-0 cursor-default; }
+  .banner { @apply mb-3 rounded-xl border border-line px-3.5 py-2.5 text-sm; }
+  .banner.ok { @apply border-ok/30 bg-ok-soft text-ink; }
+  .banner.warn { @apply border-amber/30 bg-amber-soft text-ink; }
+  .banner.bad { @apply border-alarm/30 bg-alarm-soft text-ink; }
+  .banner ul { @apply mt-1; }
+  .src { @apply my-1.5 text-mute; }
+  .src b { @apply text-ink; }
+  .qrow { @apply my-1.5; }
+  .quote { @apply italic text-mute; }
+  .type { @apply my-2 rounded-xl border border-line bg-sand/40 px-3.5 py-2.5; }
+  .type .head { @apply flex justify-between gap-2.5 font-bold text-ink; }
+  .type small { @apply block text-mute; }
+  .bar { @apply my-1.5 h-2 overflow-hidden rounded-full bg-paper; }
+  .bar i { @apply block h-full bg-accent; }
+  .bar.moderate i { background: #c57b1c; }
+  .bar.low i { background: #a39588; }
+  dl.routine { @apply my-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1; }
+  dl.routine dt { @apply font-bold text-mute; }
+  dl.routine dd { @apply m-0; }
+  .trend { @apply grid grid-cols-[1fr_auto] gap-x-2.5 gap-y-0.5 border-b border-line py-2; }
+  .trend small { @apply col-span-2 text-mute; }
+  .trend .bar { @apply col-span-2 my-1; }
+  .medrow { @apply my-1.5 grid grid-cols-2 gap-2 md:grid-cols-[1.2fr_.8fr_1.6fr_.8fr_auto]; }
+  .medrow input { @apply mt-0 min-w-0; }
+  .skeleton { @apply h-4 animate-pulse rounded bg-paper; }
+  #toast { @apply fixed bottom-20 sm:bottom-5 left-1/2 z-50 hidden max-w-[90vw] -translate-x-1/2 rounded-xl border border-accent bg-ink px-4 py-2.5 font-bold text-white shadow-lg; }
+}

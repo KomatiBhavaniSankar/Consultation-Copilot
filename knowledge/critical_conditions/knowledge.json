@@ -1,0 +1,162 @@
+{
+  "clinical_safety": {
+    "purpose": "Clinical decision support and retrieval reference; not a substitute for a clinician, local protocols, or emergency services.",
+    "audience_note": "Separate lay first aid from clinician-only interventions. Medication lists are not patient-specific prescriptions.",
+    "medication_guardrails": [
+      "Confirm patient identity, age, weight when relevant, allergies, pregnancy status, renal/hepatic function, current medicines, contraindications, and local formulary.",
+      "Use current institutional protocols and product labels for exact dosing, preparation, route, monitoring, and contraindications.",
+      "Do not delay emergency transport, imaging, reperfusion, CPR, or specialist review to search this knowledge base.",
+      "Do not give oral food, drink, or medicines to a person with possible stroke until swallowing safety is assessed.",
+      "Medication use in children, pregnancy, older adults, renal impairment, and critical illness requires extra caution and clinician oversight."
+    ],
+    "review_status": "Draft reference compiled from the sources listed in each file. Must be reviewed and signed off by the institution's clinical lead before clinical deployment.",
+    "last_reviewed": "2026-10-23",
+    "jurisdiction_note": "Designed as a general reference with India-relevant emergency number context; confirm local emergency numbers, referral pathways, drug availability, and national guidelines."
+  },
+  "schema_version": "1.0.0",
+  "folder": "critical_conditions",
+  "display_name": "Critical care: cardiac arrest and acute coronary syndrome",
+  "scope": [
+    "Adult basic and advanced life support",
+    "Suspected heart attack / acute coronary syndrome",
+    "Initial clinician assessment and escalation"
+  ],
+  "emergency_triage": {
+    "cardiac_arrest": [
+      "Unresponsive and not breathing normally or only gasping: call emergency services, begin CPR, use AED as soon as available."
+    ],
+    "suspected_heart_attack": [
+      "Chest pressure/pain, arm/jaw/back discomfort, breathlessness, cold sweat, nausea or unexplained collapse: emergency medical response; do not drive self."
+    ],
+    "layperson_actions": [
+      "Rest in a comfortable position and stay with the person.",
+      "Follow dispatcher instructions. If unresponsive and not breathing normally, start CPR and use an AED.",
+      "Do not give another person's prescription medicines. Aspirin for suspected heart attack should only be considered if the emergency dispatcher/clinician advises it and there is no known allergy or contraindication."
+    ]
+  },
+  "diagnostic_process": {
+    "cardiac_arrest": [
+      "Recognize pulseless arrest clinically; do not delay CPR for prolonged pulse checks.",
+      "Attach monitor/defibrillator, identify rhythm, defibrillate shockable rhythms and resume CPR immediately.",
+      "Search and treat reversible causes (hypoxia, hypovolaemia, electrolyte/metabolic disorder, hypothermia, tension pneumothorax, tamponade, toxins, pulmonary/coronary thrombosis).",
+      "After return of spontaneous circulation: stabilize oxygenation/ventilation and haemodynamics, obtain ECG, investigate cause and initiate post-arrest care."
+    ],
+    "acute_coronary_syndrome": [
+      "Rapid ABC assessment, vitals, cardiac monitor, IV access and 12-lead ECG ideally within 10 minutes of first medical contact/arrival.",
+      "Serial high-sensitivity troponin using the validated local 0/1-hour or 0/2-hour pathway; interpret with symptoms and ECG.",
+      "Assess for STEMI/NSTEMI and dangerous alternatives such as aortic dissection, pulmonary embolism and pneumothorax.",
+      "Activate cath lab/transfer pathway promptly when indicated."
+    ]
+  },
+  "clinical_pathways": [
+    {
+      "condition": "Adult cardiac arrest",
+      "core_actions": [
+        "High-quality chest compressions: rate 100–120/min, depth about 5–6 cm, full recoil and minimal pauses",
+        "Defibrillate VF/pulseless VT promptly; resume CPR for 2 minutes after shock",
+        "IV access is generally attempted first in professional care; IO may be reasonable if IV access is unsuccessful or infeasible",
+        "Treat reversible causes and plan post-ROSC care"
+      ]
+    },
+    {
+      "condition": "ST-elevation myocardial infarction (STEMI)",
+      "core_actions": [
+        "Immediate reperfusion strategy with primary PCI preferred when achievable in the guideline-recommended time",
+        "If timely PCI is not achievable, evaluate fibrinolysis only in eligible patients and where the current local pathway supports it",
+        "Antithrombotic therapy, monitoring and secondary prevention are clinician-directed"
+      ]
+    },
+    {
+      "condition": "Non-ST-elevation ACS",
+      "core_actions": [
+        "Risk stratify with ECG, serial troponin, haemodynamics and clinical risk score",
+        "Antiplatelet/anticoagulant therapy and invasive strategy based on risk, contraindications and cardiology pathway"
+      ]
+    }
+  ],
+  "medicines": [
+    {
+      "generic_name": "Epinephrine (adrenaline)",
+      "role": "Adult cardiac arrest medication in advanced life support; timing follows current rhythm-specific algorithm.",
+      "common_guideline_reference": "2025 AHA adult ALS guidance includes epinephrine 1 mg IV/IO every 3–5 minutes in cardiac arrest algorithms.",
+      "who_may_administer": "Trained resuscitation team only",
+      "safety": "Not a layperson medicine; use only in resuscitation with rhythm/CPR algorithm."
+    },
+    {
+      "generic_name": "Amiodarone or lidocaine",
+      "role": "May be considered for VF/pulseless VT unresponsive to defibrillation under advanced life support algorithms.",
+      "who_may_administer": "Trained resuscitation team only",
+      "safety": "Not routinely indicated for every arrest rhythm; follow current algorithm."
+    },
+    {
+      "generic_name": "Aspirin",
+      "role": "Antiplatelet therapy commonly used early in suspected ACS after assessment of contraindications.",
+      "who_may_administer": "Clinician or as advised by emergency dispatcher",
+      "safety": "Avoid with serious allergy or active bleeding; urgent clinician assessment is required. Do not give empirically if aortic dissection is suspected."
+    },
+    {
+      "generic_name": "Nitroglycerin (glyceryl trinitrate)",
+      "role": "May relieve ischaemic chest pain in selected ACS patients.",
+      "who_may_administer": "Clinician-directed or patient's own prescribed medicine as instructed",
+      "safety": "Avoid in hypotension, suspected right ventricular infarction, and recent phosphodiesterase-5 inhibitor use; does not replace emergency evaluation."
+    },
+    {
+      "generic_name": "Oxygen",
+      "role": "Supplement only when hypoxaemia or another clear indication is present, according to protocol.",
+      "who_may_administer": "Trained responder/clinician",
+      "safety": "Routine oxygen in normoxic ACS is not generally recommended."
+    },
+    {
+      "generic_name": "Anticoagulants and P2Y12 inhibitors",
+      "role": "Common components of clinician-managed ACS pathways, selected by diagnosis, bleeding risk and planned invasive strategy.",
+      "who_may_administer": "Clinician only",
+      "safety": "Bleeding risk, renal function, interactions and possibility of aortic dissection must be assessed."
+    }
+  ],
+  "current_medicine_landscape": {
+    "as_of": "2026-10-23",
+    "note": "These are established guideline-based medicines used in institutional emergency pathways, not a ranked list of the most prescribed or commercially trending drugs. Local formularies and updated AHA/ACC/ESC guidance determine use.",
+    "categories": [
+      "Resuscitation medicines: epinephrine; amiodarone or lidocaine for selected shock-refractory shockable rhythms",
+      "ACS antithrombotic medicines: aspirin, P2Y12 inhibitor and anticoagulant chosen by cardiology pathway",
+      "Selected symptom management: nitroglycerin where safe; oxygen for hypoxaemia rather than routine use"
+    ]
+  },
+  "sources": [
+    {
+      "name": "American Heart Association (AHA)",
+      "title": "2025 Guidelines for CPR and Emergency Cardiovascular Care",
+      "url": "https://professional.heart.org/en/science-news/2025-aha-guidelines-for-cpr-and-ecc",
+      "year": 2025,
+      "type": "Guideline"
+    },
+    {
+      "name": "American Heart Association (AHA)",
+      "title": "Part 7: Adult Basic Life Support (2025 AHA Guidelines)",
+      "url": "https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-basic-life-support",
+      "year": 2025,
+      "type": "Guideline"
+    },
+    {
+      "name": "AHA/ACC",
+      "title": "Guideline for the Management of Patients With Acute Coronary Syndromes",
+      "url": "https://www.ahajournals.org/journal/circ",
+      "year": 2025,
+      "type": "Guideline journal landing page; use current ACS guideline and local pathway"
+    }
+  ],
+  "retrieval_keywords": [
+    "CPR",
+    "AED",
+    "epinephrine",
+    "amiodarone",
+    "VF",
+    "pulseless VT",
+    "heart attack",
+    "ACS",
+    "ECG",
+    "troponin",
+    "STEMI",
+    "NSTEMI"
+  ]
+}

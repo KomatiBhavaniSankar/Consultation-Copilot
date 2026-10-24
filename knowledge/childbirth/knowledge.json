@@ -1,0 +1,172 @@
+{
+  "clinical_safety": {
+    "purpose": "Clinical decision support and retrieval reference; not a substitute for a clinician, local protocols, or emergency services.",
+    "audience_note": "Separate lay first aid from clinician-only interventions. Medication lists are not patient-specific prescriptions.",
+    "medication_guardrails": [
+      "Confirm patient identity, age, weight when relevant, allergies, pregnancy status, renal/hepatic function, current medicines, contraindications, and local formulary.",
+      "Use current institutional protocols and product labels for exact dosing, preparation, route, monitoring, and contraindications.",
+      "Do not delay emergency transport, imaging, reperfusion, CPR, or specialist review to search this knowledge base.",
+      "Do not give oral food, drink, or medicines to a person with possible stroke until swallowing safety is assessed.",
+      "Medication use in children, pregnancy, older adults, renal impairment, and critical illness requires extra caution and clinician oversight."
+    ],
+    "review_status": "Draft reference compiled from the sources listed in each file. Must be reviewed and signed off by the institution's clinical lead before clinical deployment.",
+    "last_reviewed": "2026-10-23",
+    "jurisdiction_note": "Designed as a general reference with India-relevant emergency number context; confirm local emergency numbers, referral pathways, drug availability, and national guidelines."
+  },
+  "schema_version": "1.0.0",
+  "folder": "childbirth",
+  "display_name": "Childbirth, labour, postpartum care and advanced maternal age",
+  "scope": [
+    "Stages of labour",
+    "Maternal and fetal warning signs",
+    "Postpartum haemorrhage",
+    "Postnatal care",
+    "Pregnancy at age 35 years and older"
+  ],
+  "triage": {
+    "urgent_maternal_red_flags": [
+      "Heavy vaginal bleeding, collapse or faintness",
+      "Severe persistent abdominal pain",
+      "Seizure, severe headache, visual changes or upper abdominal pain",
+      "Breathing difficulty, chest pain, fever with severe illness",
+      "Reduced or absent fetal movement, cord visible/felt, or abnormal fetal heart rate",
+      "Waters break with concerning fluid, preterm labour symptoms, or severe hypertension"
+    ],
+    "urgent_newborn_red_flags": [
+      "Difficulty breathing, blue colour, poor feeding, unusual floppiness or difficult to wake",
+      "Fever or low temperature, convulsions, jaundice in first 24 hours",
+      "Any newborn deterioration warrants urgent clinical review"
+    ]
+  },
+  "diagnostic_process": [
+    {
+      "stage": "Antenatal assessment",
+      "items": [
+        "Confirm gestational age and obstetric history; review comorbidities and medicines.",
+        "Monitor blood pressure and symptoms of pre-eclampsia; assess fetal growth/movement and indicated antenatal screening.",
+        "For older maternal age, discuss age-related risks without assuming a complication; offer screening/diagnostic options and individualized birth planning."
+      ]
+    },
+    {
+      "stage": "Labour triage",
+      "items": [
+        "Maternal vital signs, contractions, bleeding, membrane status and fetal movement",
+        "Fetal heart rate assessment and labour progress/cervical examination when appropriate and consented",
+        "Assess for infection, hypertensive disease, haemorrhage, malpresentation and cord prolapse"
+      ]
+    },
+    {
+      "stage": "Postpartum",
+      "items": [
+        "Assess bleeding, uterine tone, pulse, blood pressure, pain, temperature, urination, mental health and feeding",
+        "Evaluate heavy bleeding urgently; identify tone, trauma, tissue and thrombin/coagulation causes",
+        "Provide follow-up and explicit return precautions for maternal and newborn danger signs"
+      ]
+    }
+  ],
+  "care_pathways": [
+    {
+      "condition": "Labour",
+      "details": [
+        "First stage: cervical dilation and labour progress; active-phase definitions vary by guideline.",
+        "Second stage: full dilation to birth; monitor maternal condition and fetal heart rate.",
+        "Third stage: delivery of placenta; active management with a uterotonic is commonly used to reduce postpartum bleeding.",
+        "Immediate post-birth observation includes bleeding, uterine tone, vital signs, newborn breathing/temperature and early skin-to-skin/breastfeeding where safe."
+      ]
+    },
+    {
+      "condition": "Pre-eclampsia/eclampsia",
+      "details": [
+        "Suspect with hypertension after 20 weeks plus proteinuria or maternal organ dysfunction; symptoms can include severe headache, visual symptoms or epigastric/right-upper-quadrant pain.",
+        "Severe hypertension or seizure is an obstetric emergency; urgent senior obstetric review, maternal stabilization, magnesium sulfate for seizure prevention/treatment when indicated, and protocol-directed antihypertensive therapy."
+      ]
+    },
+    {
+      "condition": "Postpartum haemorrhage",
+      "details": [
+        "Call obstetric emergency team; assess ABCs, quantify blood loss, obtain IV access and labs, warm patient and monitor closely.",
+        "Treat likely causes simultaneously: uterine massage and uterotonics for atony, evaluate trauma/retained tissue/coagulopathy, resuscitate and escalate to procedures/surgery when required.",
+        "WHO guidance supports early tranexamic acid within 3 hours of birth for diagnosed PPH alongside standard care; exact protocol and contraindications must be checked locally."
+      ]
+    },
+    {
+      "condition": "Advanced maternal age",
+      "details": [
+        "Age 35 years or older is a risk marker, not a diagnosis. Individualize counselling and screening.",
+        "Review hypertension, diabetes, medication safety, genetic screening choices, fetal growth and timing/place of birth with the obstetric team.",
+        "Do not automatically start aspirin or induce labour solely from age without assessing the complete clinical picture and local guideline."
+      ]
+    }
+  ],
+  "medicines": [
+    {
+      "generic_name": "Oxytocin",
+      "role": "Uterotonic used for prevention and treatment of postpartum haemorrhage and in selected labour protocols.",
+      "who_may_administer": "Trained maternity clinician only",
+      "safety": "Requires correct indication, route, storage, monitoring and institutional protocol; dosing differs by prevention versus treatment."
+    },
+    {
+      "generic_name": "Tranexamic acid",
+      "role": "Adjunct for treatment of diagnosed postpartum haemorrhage; benefit is time-sensitive and WHO recommends administration as soon as possible within 3 hours of birth when indicated.",
+      "who_may_administer": "Clinician only",
+      "safety": "Not a replacement for uterotonics, resuscitation or source control; assess contraindications and use the local PPH bundle."
+    },
+    {
+      "generic_name": "Magnesium sulfate",
+      "role": "Prevention/treatment of eclamptic seizures in appropriate severe pre-eclampsia/eclampsia pathways.",
+      "who_may_administer": "Clinician only with monitoring",
+      "safety": "Monitor respiratory status, reflexes, urine output and toxicity; calcium gluconate may be used as antidote under protocol."
+    },
+    {
+      "generic_name": "Labetalol, hydralazine or nifedipine (protocol-dependent)",
+      "role": "Agents used by clinicians to treat severe hypertension in pregnancy/postpartum, depending on patient and protocol.",
+      "who_may_administer": "Clinician only",
+      "safety": "Urgent monitoring and obstetric oversight required; do not self-medicate."
+    },
+    {
+      "generic_name": "Antenatal corticosteroids (e.g., betamethasone)",
+      "role": "May be used when preterm birth is likely within the guideline-defined gestational window to improve neonatal outcomes.",
+      "who_may_administer": "Obstetric clinician only",
+      "safety": "Eligibility depends on gestational age, likelihood of birth and maternal/fetal context."
+    }
+  ],
+  "current_medicine_landscape": {
+    "as_of": "2026-10-23",
+    "note": "These are established guideline-supported obstetric medicines, not a market trend ranking.",
+    "key_groups": [
+      "Oxytocin and other protocol-selected uterotonics for PPH prevention/treatment",
+      "Tranexamic acid as early adjunct in diagnosed PPH",
+      "Magnesium sulfate for severe pre-eclampsia/eclampsia when indicated",
+      "Protocol-selected antihypertensives for severe pregnancy/postpartum hypertension",
+      "Antenatal corticosteroids for eligible threatened preterm birth"
+    ]
+  },
+  "sources": [
+    {
+      "name": "World Health Organization (WHO)",
+      "title": "WHO recommendations for the prevention and treatment of postpartum haemorrhage",
+      "url": "https://www.who.int/publications/i/item/9789241548502",
+      "year": 2012,
+      "type": "Guideline"
+    },
+    {
+      "name": "World Health Organization (WHO)",
+      "title": "WHO recommendations on maternal and newborn care for a positive postnatal experience",
+      "url": "https://www.who.int/publications/i/item/9789240045989",
+      "year": 2022,
+      "type": "Guideline"
+    }
+  ],
+  "retrieval_keywords": [
+    "labour stages",
+    "fetal heart rate",
+    "pre-eclampsia",
+    "eclampsia",
+    "magnesium sulfate",
+    "postpartum haemorrhage",
+    "oxytocin",
+    "tranexamic acid",
+    "advanced maternal age",
+    "newborn danger signs"
+  ]
+}

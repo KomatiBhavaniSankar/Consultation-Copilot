@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#a6192e">
+<title>Consultation Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<!--TAILWIND-->
+</head>
+<body data-mode="lifestyle" class="min-h-screen pb-[env(safe-area-inset-bottom)]">
+
+<header class="sticky top-0 z-30 border-b-2 border-accent/20 bg-white/95 backdrop-blur pt-[env(safe-area-inset-top)] shadow-sm">
+  <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5">
+    <div class="flex items-center gap-2.5 mr-auto min-w-0">
+      <span class="grid h-9 w-9 flex-none place-items-center rounded-xl bg-accent text-white shadow-sm" aria-hidden="true">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v4M4.93 4.93l2.83 2.83M2 12h4M19.07 4.93l-2.83 2.83M22 12h-4M7 16a5 5 0 0 1 10 0M3 20h18"/>
+        </svg>
+      </span>
+      <div class="truncate">
+        <h1 class="truncate text-base font-bold leading-tight text-ink sm:text-lg">Consultation Copilot</h1>
+        <p class="hidden text-[11px] font-bold tracking-wider text-accent uppercase sm:block">Clinical Decision Support</p>
+      </div>
+    </div>
+    <nav class="hidden gap-1 sm:flex" aria-label="Page"><button class="viewtab on" data-view="1" type="button">Consultation</button><button class="viewtab" data-view="2" type="button">Patient records</button></nav>
+    <a id="callA" class="btn-alarm" href="tel:112">Call 112</a>
+    <a id="callB" class="btn-alarm alt hidden md:inline-flex" href="tel:108">Ambulance 108</a>
+  </div>
+  <div class="mx-auto max-w-6xl px-4 pb-3">
+    <div class="relative" id="modeSel">
+      <button id="modeBtn" type="button" class="modebtn" aria-haspopup="menu" aria-expanded="false" aria-controls="modeList"><span><b id="modeName"></b><small id="modeShort"></small></span></button>
+      <div id="modeList" class="modelist" role="menu" hidden></div>
+    </div>
+  </div>
+</header>
+<nav class="botnav sm:hidden" aria-label="Page"><button class="viewtab on" data-view="1" type="button">Consultation</button><button class="viewtab" data-view="2" type="button">Records</button></nav>
+
+<main class="mx-auto max-w-6xl px-4 py-5 pb-28 sm:pb-24">
+<div id="view1">
+
+  <!-- quick tiles: opens and closes -->
+  <details id="quick" class="pane mb-4" hidden open>
+    <summary><h2>Tap what is happening</h2><small class="tog"></small></summary>
+    <div id="tiles" class="body grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"></div>
+  </details>
+
+  <!-- input: voice or text -->
+  <section class="pane" aria-label="Conversation input">
+    <p id="modeTag" class="mb-3.5 text-sm text-mute"></p>
+    <div class="flex flex-wrap items-center gap-4">
+      <button id="mic" type="button" aria-label="Start listening">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg>
+      </button>
+      <div class="min-w-0 flex-1 basis-56">
+        <input type="text" id="patient" placeholder="Patient name" aria-label="Patient name" autocomplete="off">
+        <div id="status" class="mt-1.5 text-sm font-medium text-mute" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+    <div id="langrow" class="mt-3" hidden>
+      <label for="lang" class="mt-0">Speaking language (live listening)</label>
+      <select id="lang" class="sm:max-w-xs">
+        <option value="en-IN">English (India)</option><option value="hi-IN">Hindi</option><option value="kn-IN">Kannada</option>
+        <option value="ta-IN">Tamil</option><option value="te-IN">Telugu</option><option value="en-US">English (US)</option>
+      </select>
+    </div>
+    <details class="sub" id="typed">
+      <summary id="typedsum">No microphone? Paste or type the conversation instead</summary>
+      <textarea id="typedtxt" rows="5" aria-label="Conversation text"></textarea>
+      <p class="mt-2.5"><button class="btn ghost w-full sm:w-auto" id="runtxt" type="button">Analyze text</button></p>
+    </details>
+    <div class="mt-4 border-t border-line pt-3.5"><button class="btn w-full sm:w-auto" id="save" type="button" disabled>Save to records</button></div>
+  </section>
+
+  <div id="results" class="flex flex-col">
+    <div id="triageBox" aria-live="assertive"></div>
+
+    <!-- conversation: opens and closes -->
+    <details class="pane" id="conv" open>
+      <summary><h2>Conversation</h2><small id="convsum">Tap to open or close</small></summary>
+      <div class="body" id="left"><p class="empty">The conversation will appear here, split by speaker when the speakers can be told apart. It is saved with the record and added to the search index.</p></div>
+    </details>
+
+    <!-- emergency, critical care, childbirth -->
+    <section id="guidOut" class="pane mt-4" hidden aria-live="polite">
+      <h2 id="guidTitle">Guidance from your documents</h2>
+      <div id="guid"><p class="empty">Guidance appears here after the conversation is analyzed.</p></div>
+    </section>
+
+    <!-- lifestyle disease (closed by default as dropdown accordions) -->
+    <div id="lifeOut">
+      <details class="pane" id="predbox">
+        <summary><h2>Possible types and tests to confirm it</h2><small class="tog"></small></summary>
+        <div class="body" id="pred"><p class="empty">Once the patient has described their symptoms and daily routine, the possible types of diabetes and the tests that confirm them will appear here.</p></div>
+      </details>
+      <div class="grid3">
+        <details class="pane" aria-live="polite"><summary><h2>Medicines</h2><small class="tog"></small></summary>
+          <div class="body" id="c1"><p class="empty">Medicines physicians commonly use, and what this doctor usually prescribes, will appear here.</p></div></details>
+        <details class="pane"><summary><h2>What the clinic gave similar patients</h2><small class="tog"></small></summary>
+          <div class="body" id="c2"><p class="empty">Earlier patients with similar problems, and the medicines they were given, will appear here.</p></div></details>
+        <details class="pane"><summary><h2>Diagnosis plan</h2><small class="tog"></small></summary>
+          <div class="body"><div id="c3"><p class="empty">Activity, diet, lifestyle changes, medicines that might be needed and the next follow-up will appear here.</p></div>
+          <p class="note">Suggestions support the doctor's judgement and must be verified against current guidelines.</p></div></details>
+      </div>
+    </div>
+
+    <section class="pane mt-4" style="order:9" id="sheetbox" hidden>
+      <h2 id="sh_title">Patient take-home sheet</h2>
+      <p class="empty" id="sh_note">Built only from what the doctor said. Check and correct anything before giving it to the patient.</p>
+      <div class="two">
+        <label>Diagnosis<textarea id="sh_dx" rows="2"></textarea></label>
+        <label>Summary in simple words<textarea id="sh_sum" rows="2"></textarea></label>
+      </div>
+      <h3>Medicines</h3>
+      <div id="sh_warn"></div>
+      <div id="meds"></div>
+      <button class="btn ghost mt-2" id="addmed" type="button">Add medicine</button>
+      <h3 id="sh_h3">Lifestyle advice from the doctor (one item per line)</h3>
+      <div class="two">
+        <label><span id="lb_diet">Food and drink</span><textarea id="sh_diet" rows="3"></textarea></label>
+        <label><span id="lb_exercise">Activity</span><textarea id="sh_exercise" rows="3"></textarea></label>
+        <label><span id="lb_monitoring">Checks to do at home</span><textarea id="sh_monitoring" rows="3"></textarea></label>
+        <label><span id="lb_other">Other advice</span><textarea id="sh_other" rows="3"></textarea></label>
+      </div>
+      <label>Next visit<textarea id="sh_fu" rows="2"></textarea></label>
+      <div class="actions">
+        <input type="text" id="doctor" class="sm:max-w-xs" placeholder="Doctor name (printed on the sheet)" aria-label="Doctor name">
+        <button class="btn" id="dl" type="button">Download PDF</button>
+        <button class="btn ghost" id="pr" type="button">Print</button>
+        <button class="btn ghost" id="sh" type="button">Share</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="view2" hidden>
+  <div class="pane mb-4">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_15rem]">
+      <input type="text" id="search" class="mt-0" placeholder="Search by patient, diagnosis or medicine" aria-label="Search records">
+      <select id="rmode" class="mt-0" aria-label="Filter by use case"><option value="">All use cases</option></select>
+    </div>
+  </div>
+  <div class="scroll"><table class="recs">
+    <thead><tr><th>Date</th><th>Patient</th><th>Diagnosis</th><th>Medicines</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+</div>
+</main>
+
+<footer class="mx-auto max-w-6xl px-4 pb-8 text-xs text-mute">
+  Decision support for people and clinicians, not a diagnosis. In an emergency call the emergency number first and follow the dispatcher.
+</footer>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const medNames = ms => (ms || []).map(m => m.name + (m.dosage && m.dosage !== "Not mentioned" ? ` (${m.dosage})` : "")).join(", ") || "None";
+function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2600)}
+const bubbles = d => (d || []).map(t => `<div class="bubble ${t.speaker === "Doctor" ? "Doctor" : "Patient"}"><b>${esc(t.speaker)}</b>${esc(t.text)}</div>`).join("");
+
+let CFG = { modes: [], emergency_number: "112", ambulance_number: "108" }, MODE = "lifestyle", PROTOS = [], current = null;
+const modeCfg = () => CFG.modes.find(m => m.id === MODE) || {};
+const isFast = () => modeCfg().pipeline === "fast";
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const TEXT = {
+  emergency: { tag: "For a parent, bystander or patient. Speak or type what is happening. The steps appear instantly and the AI adds details from your documents.",
+    ph: "Example: My father's face is drooping on one side and his speech is slurred.\nExample: My 8 month old baby is choking.", wait: "Checking your documents and the AI. The steps above are valid right now." },
+  critical: { tag: "For doctors and paramedics. Speak or type the doctor-patient conversation. A clinician checklist appears instantly, then the AI adds details from your documents.",
+    ph: "Doctor: What brought you in?\nPatient: Chest pain for 30 minutes, it goes to my left arm and I am sweating.", wait: "Checking your documents and the AI. The checklist above is valid right now." },
+  lifestyle: { tag: "Diabetes and everyday conditions. Record the consultation or paste the conversation. This can take a few minutes with a local model.",
+    ph: "Doctor: What brings you in today?\nPatient: I am very thirsty and I pass urine many times at night...",
+    wait: "Transcribing, screening for diabetes, planning retrieval and checking evidence. This can take a few minutes with a local model…" },
+  maternity: { tag: "Labor, delivery and care for older mothers. Record the conversation or paste it. The agent searches the childbirth documents and checks every suggestion against them.",
+    ph: "Doctor: How many weeks are you?\nPatient: 38 weeks. Contractions every 5 minutes and my waters broke an hour ago. I am 41.",
+    wait: "Transcribing, planning retrieval and checking evidence in the childbirth documents. This can take a few minutes with a local model…" },
+};
+const setStatus = t => { $("status").textContent = t; };
+
+// ---------- modes ----------
+function buildTabs() {
+  $("modeList").innerHTML = CFG.modes.map(m => `<button type="button" role="menuitemradio" class="modeitem" data-mode="${esc(m.id)}" aria-checked="false"><b>${esc(m.label)}</b><small>${esc(m.short)}</small></button>`).join("");
+  $("rmode").innerHTML = `<option value="">All use cases</option>` + CFG.modes.map(m => `<option value="${esc(m.id)}">${esc(m.label)}</option>`).join("");
+}
+function modeMenu(open) { $("modeList").hidden = !open; $("modeBtn").setAttribute("aria-expanded", open); }
+$("modeBtn").onclick = () => modeMenu($("modeList").hidden);
+$("modeList").onclick = e => { const b = e.target.closest("[data-mode]"); if (b) { modeMenu(false); setMode(b.dataset.mode); window.scrollTo({ top: 0, behavior: "smooth" }); } };
+document.addEventListener("click", e => { if (!e.target.closest("#modeSel")) modeMenu(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") modeMenu(false); });
+
+function setMode(id) {
+  if (!CFG.modes.some(m => m.id === id)) id = CFG.default || "lifestyle";
+  MODE = id; document.body.dataset.mode = id; history.replaceState(null, "", "#" + id);
+  document.querySelectorAll(".modeitem").forEach(b => b.setAttribute("aria-checked", b.dataset.mode === id));
+  $("modeName").textContent = modeCfg().label || ""; $("modeShort").textContent = modeCfg().short || "";
+  $("sheetbox").hidden = true; lastProtos = [];
+  const fast = isFast(), life = id === "lifestyle", T = TEXT[id] || TEXT.lifestyle;
+  if (fast) $("quick").open = true;
+  if (life) document.querySelectorAll("#lifeOut details.pane").forEach(d => { d.open = false; });
+  $("quick").hidden = !fast; $("lifeOut").hidden = !life; $("guidOut").hidden = life || !current;
+  $("conv").style.order = life ? 0 : 5; $("guidOut").style.order = 2;
+  $("triageBox").innerHTML = ""; lastSig = ""; $("guid").innerHTML = `<p class="empty">Guidance appears here after the conversation is analyzed.</p>`;
+  $("guidTitle").textContent = fast ? "Specific to this situation (AI, from your documents)" : "Guidance from your documents";
+  $("modeTag").textContent = T.tag; $("typedtxt").placeholder = T.ph; $("typed").open = fast;
+  $("typedsum").textContent = fast ? "Type or paste what is happening" : "No microphone? Paste or type the conversation instead";
+  $("patient").placeholder = fast ? "Patient name (optional)" : "Patient name";
+  $("langrow").hidden = !(SR && modeCfg().live_voice);
+  const theme = { emergency: "#c4122f", critical: "#8a1124", maternity: "#94293b", lifestyle: "#a6192e" }[id];
+  document.querySelector('meta[name="theme-color"]').content = theme;
+  current = null; $("save").disabled = true;
+  setStatus(fast ? "Tap a tile, type, or press the microphone and speak." : "Press the microphone to start listening.");
+  if (fast) loadProtocols();
+}
+
+function setCalls() {
+  $("callA").href = "tel:" + CFG.emergency_number; $("callA").textContent = "Call " + CFG.emergency_number;
+  $("callB").href = "tel:" + CFG.ambulance_number; $("callB").textContent = "Ambulance " + CFG.ambulance_number;
+}
+
+// ---------- instant protocols ----------
+async function loadProtocols() {
+  try { PROTOS = (await (await fetch("/protocols?mode=" + MODE)).json()).protocols;
+    PROTOS = PROTOS.filter(p => p.id !== "stroke");
+    if (MODE === "critical") PROTOS = PROTOS.filter(p => !p.id.startsWith("choking")); } catch { PROTOS = []; }
+  $("tiles").innerHTML = PROTOS.map(p => `<button type="button" class="tile" data-p="${esc(p.id)}">${esc(p.title)}<small>Tap for the steps now</small></button>`).join("");
+}
+
+$("tiles").onclick = e => { const b = e.target.closest("[data-p]"); if (!b) return; showProtocols(PROTOS.filter(p => p.id === b.dataset.p));
+  if (innerWidth < 640) $("quick").open = false;      // on a phone, close the list so the steps fill the screen
+  $("triageBox").scrollIntoView({ behavior: "smooth", block: "start" }); };
+
+let lastSig = "", metro = null, lastProtos = [];
+function protoCard(p, tri) {
+  const li = a => (a || []).map(x => `<li>${esc(x)}</li>`).join("");
+  return `<article class="proto">
+    <header><h2>${esc(p.title)}</h2><p>${esc(p.headline)}</p></header>
+    <div class="calls"><a class="btn-alarm" href="tel:${esc(CFG.emergency_number)}">Call ${esc(CFG.emergency_number)}</a>
+      <a class="btn-alarm alt" href="tel:${esc(CFG.ambulance_number)}">Ambulance ${esc(CFG.ambulance_number)}</a>
+      ${p.metronome ? `<button type="button" class="btn ghost min-h-[52px]" data-metro>Start CPR beat</button>` : ""}</div>
+    <div class="inner">
+      ${p.clinician ? `<p class="mini">Clinician checklist. Verify against your local protocol.</p>` : ""}
+      <p class="mini">Tap a step to tick it off.</p>
+      <ol class="steps">${li(p.steps)}</ol>
+      <details class="sub" open><summary>Do not</summary><ul>${li(p.avoid)}</ul></details>
+      <details class="sub"><summary>Signs to look for</summary><ul>${li(p.signs)}</ul></details>
+      <details class="sub"><summary>Tell the ambulance or doctor</summary><ul>${li(p.tell)}</ul></details>
+    </div></article>`;
+}
+function showProtocols(list, note) {
+  const sig = list.map(p => p.id).join(",");
+  if (sig === lastSig) return;                       // do not redraw (and jump the page) when nothing changed
+  lastSig = sig; lastProtos = list;
+  $("triageBox").innerHTML = list.length
+    ? (note || "") + list.map(p => protoCard(p)).join("") : "";
+  if (metro) document.querySelectorAll("[data-metro]").forEach(b => b.textContent = "Stop CPR beat");
+}
+function renderTriage(tri) {
+  const list = ((tri && tri.protocols) || []).filter(p => p.id !== "stroke");
+  const ageNote = list.length === 2 && list.every(p => p.id.startsWith("choking"))
+    ? `<div class="banner warn mt-4">The child's age was not given. Use the card that matches: <b>under 1 year</b> or <b>1 year and older</b>.</div>` : "";
+  showProtocols(list, ageNote);
+}
+
+$("triageBox").onclick = e => { const b = e.target.closest("[data-metro]"); if (b) { toggleMetro(b); return; } const s = e.target.closest("ol.steps > li"); if (s) s.classList.toggle("done"); };
+function toggleMetro(btn) {                           // 110 beats a minute for CPR compressions
+  if (metro) { clearInterval(metro.t); metro.ctx.close(); metro = null; btn.textContent = "Start CPR beat"; return; }
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const beep = () => { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = 880;
+    g.gain.setValueAtTime(.4, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .08);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime + .09); };
+  beep(); metro = { ctx, t: setInterval(beep, 545) }; btn.textContent = "Stop CPR beat";
+}
+async function instantTriage(text) {
+  if (!isFast() || !text.trim()) return;
+  try {
+    const fd = new FormData(); fd.append("text", text); fd.append("mode", MODE);
+    renderTriage(await (await fetch("/triage", { method: "POST", body: fd })).json());
+  } catch { /* the full analysis still shows the same steps */ }
+}
+
+// ---------- listening: live speech for emergencies, recording + Whisper otherwise ----------
+let recorder, chunks = [], stream, timer, secs = 0, live = null, liveOn = false, liveTimer;
+const setRec = on => { $("mic").classList.toggle("rec", on); $("mic").setAttribute("aria-label", on ? "Stop listening" : "Start listening"); };
+const useLive = () => SR && modeCfg().live_voice;
+
+function startLive() {
+  const rec = new SR(); rec.lang = $("lang").value; rec.continuous = true; rec.interimResults = true;
+  const keep = () => { const v = $("typedtxt").value.trim(); return v ? v + " " : ""; };
+  let base = keep(), finals = "";
+  rec.onresult = e => {
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) finals += r[0].transcript + " "; else interim += r[0].transcript; }
+    $("typedtxt").value = base + finals + interim; $("typed").open = true;
+    clearTimeout(liveTimer); liveTimer = setTimeout(() => instantTriage($("typedtxt").value), 600);   // steps appear while they are still speaking
+  };
+  rec.onerror = e => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") { liveOn = false; setStatus("Microphone blocked. Allow microphone access in the browser, or type instead."); }
+    else if (e.error === "network") { liveOn = false; setStatus("Live listening needs an internet connection in this browser. Type instead."); }
+  };
+  rec.onend = () => {
+    if (liveOn) { base = keep(); finals = ""; try { rec.start(); } catch {} return; }   // the browser stops after silence: keep listening
+    setRec(false);
+    const text = $("typedtxt").value.trim();
+    if (text) { const fd = new FormData(); fd.append("transcript_text", text); runAnalysis(fd, text); }
+  };
+  liveOn = true; live = rec; rec.start(); setRec(true);
+  setStatus("Listening… speak now. Press the microphone again when you are done.");
+}
+
+$("mic").onclick = async () => {
+  if (liveOn) { liveOn = false; live.stop(); return; }
+  if (recorder && recorder.state === "recording") { recorder.stop(); return; }
+  if (!window.isSecureContext || !navigator.mediaDevices) { setStatus("The microphone only works on https:// or localhost. Type instead, or see the deployment guide."); return; }
+  if (useLive()) { startLive(); return; }
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch { setStatus("Microphone blocked. Allow microphone access in the browser and try again, or paste the conversation below."); return; }
+  chunks = []; secs = 0;
+  recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.onstop = onStopped;
+  recorder.start(); setRec(true);
+  timer = setInterval(() => { secs++; setStatus(`Listening… ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}. Press again to stop.`); }, 1000);
+  setStatus("Listening… 0:00. Press again to stop.");
+};
+
+async function runAnalysis(fd, text) {
+  const T = TEXT[MODE] || TEXT.lifestyle;
+  setStatus(T.wait); $("save").disabled = true;
+  fd.append("patient_name", $("patient").value.trim()); fd.append("mode", MODE);
+  if (isFast()) {
+    $("guidOut").hidden = false; $("guid").innerHTML = `<div class="skeleton w-3/4"></div><div class="skeleton mt-2 w-1/2"></div>`;
+    instantTriage(text || "");
+  }
+  try {
+    const r = await fetch("/analyze", { method: "POST", body: fd });
+    if (!r.ok) { let d = "Analysis failed"; try { d = (await r.json()).detail || d; } catch {} throw new Error(d); }
+    current = await r.json(); renderResult(current);
+    $("save").disabled = false; setStatus("Done. Review the results, then save to records.");
+  } catch (e) {
+    setStatus("Problem: " + e.message);
+    if (isFast()) { $("guid").innerHTML = `<div class="banner warn">The AI could not answer (${esc(e.message)}). The steps above are still valid.</div>`;
+      if (lastProtos.length) renderSheet(protoSheet(lastProtos), []); }
+  }
+}
+
+async function onStopped() {
+  clearInterval(timer); stream.getTracks().forEach(t => t.stop()); setRec(false);
+  try {
+    const fd = new FormData(); fd.append("audio_file", await toWav(new Blob(chunks)), "consultation.wav");
+    await runAnalysis(fd, "");
+  } catch (e) { setStatus("Problem: " + e.message); }
+}
+
+$("runtxt").onclick = () => {
+  const text = $("typedtxt").value.trim();
+  if (!text) { toast("Paste or type the conversation first"); return; }
+  const fd = new FormData(); fd.append("transcript_text", text); runAnalysis(fd, text);
+};
+$("typedtxt").addEventListener("input", () => { clearTimeout(liveTimer); liveTimer = setTimeout(() => instantTriage($("typedtxt").value), 500); });
+
+// Convert recorded audio to 16 kHz mono 16-bit WAV
+async function toWav(blob) {
+  const ctx = new AudioContext();
+  const dec = await ctx.decodeAudioData(await blob.arrayBuffer()); ctx.close();
+  const off = new OfflineAudioContext(1, Math.ceil(dec.duration * 16000), 16000);
+  const src = off.createBufferSource(); src.buffer = dec; src.connect(off.destination); src.start();
+  const d = (await off.startRendering()).getChannelData(0);
+  const v = new DataView(new ArrayBuffer(44 + d.length * 2));
+  const w = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  w(0,"RIFF"); v.setUint32(4, 36 + d.length*2, true); w(8,"WAVEfmt "); v.setUint32(16,16,true);
+  v.setUint16(20,1,true); v.setUint16(22,1,true); v.setUint32(24,16000,true); v.setUint32(28,32000,true);
+  v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,"data"); v.setUint32(40, d.length*2, true);
+  d.forEach((s, i) => v.setInt16(44 + i*2, Math.max(-1, Math.min(1, s)) * 0x7fff, true));
+  return new Blob([v], { type: "audio/wav" });
+}
+
+// ---------- results for emergency, critical care and childbirth ----------
+function renderResult(res) {
+  $("guidOut").hidden = MODE === "lifestyle";
+  if (MODE === "lifestyle") { render(res); renderSheet(res.sheet, res.sheet_warnings); return; }
+  if (res.triage) renderTriage(res.triage);
+  renderGuidance(res); renderConversation(res);
+  renderSheet(autoSheet(res), []);
+}
+function renderConversation(res) {
+  const turns = (res.extracted.dialogue || []).length;
+  $("convsum").textContent = turns ? `${turns} turns · tap to open or close` : "Tap to open or close";
+  $("left").innerHTML = `<div class="convo">${bubbles(res.extracted.dialogue) || `<p>${esc(res.transcript)}</p>`}</div>`;
+}
+function renderGuidance(res) {
+  const g = res.guidance, ev = Object.fromEntries((res.evidence || []).map(e => [e.id, e]));
+  const warns = (res.warnings || []).length ? `<div class="banner warn"><ul>${res.warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>` : "";
+  if (!g) { $("guid").innerHTML = warns || `<p class="empty">No AI guidance this time.</p>`; return; }
+  const chips = it => (it.evidence || []).map(id => { const e = ev[id]; return `<span class="chip" title="${esc(e ? e.source + " " + e.page_label : "")}">${esc(id)}</span>`; }).join("")
+    + (it.supported === false ? `<span class="chip warn" title="No retrieved document supports this line">unverified</span>` : "");
+  const list = a => (a || []).length ? `<ul>${a.map(x => `<li>${esc(x.text)} ${chips(x)}</li>`).join("")}</ul>` : `<p class="empty">Nothing to add.</p>`;
+  const plain = a => (a || []).length ? `<ul>${a.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="empty">Nothing to add.</p>`;
+  const urg = { call_now: ["bad", "Call emergency services now."], urgent: ["warn", "Urgent: get medical help today."], routine: ["ok", "No emergency pattern found. Routine review."] }[g.urgency] || ["warn", ""];
+  const conf = { sufficient: "Backed by your documents.", partial: "Only partly backed by your documents. Verify.", insufficient: "No supporting document found. Treat as unverified." }[res.confidence] || "";
+  const used = (res.evidence || []).filter(e => e.relevant);
+  const ag = res.agent || { questions: [], metrics: {}, steps: [] }, m = ag.metrics || {};
+  const qs = (ag.questions || []).map(q => `<div class="qrow"><b>${esc(q.id)}</b> ${esc(q.question)}<br><small>${esc(q.tool)} · ${esc(q.status)} · ${q.relevant}/${q.retrieved} passages relevant${q.rewrites ? " · query rewritten" : ""}</small></div>`).join("");
+  $("guid").innerHTML = warns
+    + `<div class="banner ${urg[0]}"><b>${esc(g.headline || "Unclear")}</b><br>${esc(urg[1])} <span class="text-mute">${esc(conf)}</span></div>`
+    + (g.summary ? `<p>${esc(g.summary)}</p>` : "")
+    + `<h3>Do this</h3>${list(g.steps)}`
+    + `<details class="sub" open><summary>Do not</summary>${list(g.avoid)}</details>`
+    + `<details class="sub" open><summary>Get more help now if</summary>${list(g.escalate)}</details>`
+    + `<details class="sub"><summary>Ask right now</summary>${plain(g.ask)}</details>`
+    + `<details class="sub"><summary>Also noted</summary>${plain(g.notes)}</details>`
+    + `<p class="note">Chips like E1 point to a source passage. “unverified” means no retrieved document supports that line.</p>`
+    + `<details class="sub"><summary>Sources (${used.length})</summary>${used.map(e => `<p class="src"><b>${esc(e.id)}</b> ${esc(e.source)} ${esc(e.page_label)} · ${esc(e.domain || "")}<br>${esc(e.snippet)}</p>`).join("") || `<p class="empty">No passages.</p>`}</details>`
+    + `<details class="sub"><summary>How the agent worked</summary>${(ag.steps || []).map(s => `<p class="src">${esc(s)}</p>`).join("")}${qs}`
+    + (m.total_items ? `<p class="src">Retrieval precision: ${m.retrieval_precision ?? "n/a"} · Suggestions backed by evidence: ${m.grounded_items ?? 0}/${m.total_items ?? 0}</p>` : "") + `</details>`;
+}
+
+// ---------- Rendering ----------
+function render(res) {
+  const ex = res.extracted, ad = res.advice;
+  const ev = Object.fromEntries((res.evidence || []).map(e => [e.id, e]));
+  const chips = it => {
+    const c = (it.evidence || []).map(id => { const e = ev[id]; return `<span class="chip" title="${esc(e ? e.source + " " + e.page_label : "")}">${esc(id)}</span>`; }).join("");
+    const w = it.supported === false ? `<span class="chip warn" title="${esc(it.note || "Not backed by retrieved evidence")}">unverified</span>` : "";
+    return c + w;
+  };
+  const items = a => a && a.length ? `<ul>${a.map(x => `<li>${esc(x.text ?? x)} ${chips(x)}</li>`).join("")}</ul>` : `<p class="empty">Nothing to show.</p>`;
+  const medCards = a => (a || []).length ? a.map(m => `<div class="med">${esc(m.name)} ${chips(m)}<small>${esc(m.drug_class)}${m.why ? " — " + esc(m.why) : ""}</small></div>`).join("") : `<p class="empty">No suggestions.</p>`;
+
+  // Conversation box (open/close)
+  const turns = (ex.dialogue || []).length;
+  $("convsum").textContent = turns ? `${turns} turns · click to open or close` : "Open or close";
+  $("left").innerHTML = `<div class="convo">${bubbles(ex.dialogue) || `<p>${esc(res.transcript)}</p>`}</div>
+     <h3>How the doctor handled it</h3><p>${esc(ex.doctor_approach) || "Not available."}</p>
+     <h3>Diagnosis stated</h3><p>${esc(ex.diagnosis)}</p>
+     <h3>Medicines mentioned</h3>${(ex.medicines||[]).length ? ex.medicines.map(m => `<div class="med">${esc(m.name)} <small>${esc(m.dosage)} · ${esc(m.status)}</small></div>`).join("") : `<p class="empty">None mentioned.</p>`}
+     <h3>Vitals</h3><p>${esc(ex.vitals)}</p>`;
+
+  renderPrediction(res.prediction);
+
+  // Column 1: medicines
+  const tr = res.trends || { records: 0, medicines: [], approaches: [] };
+  const trendRows = tr.medicines.length
+    ? tr.medicines.map(m => { const pct = Math.round(100 * m.count / Math.max(m.total, 1));
+        return `<div class="trend"><b>${esc(m.name)}</b><span>${m.count} of ${m.total}</span><div class="bar"><i style="width:${pct}%"></i></div>${m.typical_dose ? `<small>Usual dose in your records: ${esc(m.typical_dose)}</small>` : ""}</div>`; }).join("")
+    : `<p class="empty">${esc(tr.note || "No saved records match yet. Save consultations and this doctor's prescribing pattern will build up here.")}</p>`;
+  const appr = (tr.approaches || []).map(a => `<div class="past"><b>${esc(a.patient_name)}</b> · ${esc(a.date)}<small>${esc(a.text)}</small></div>`).join("");
+  $("c1").innerHTML = `<h3>General medicines physicians use for this problem</h3>${(ad.standard_medicines || []).length ? medCards(ad.standard_medicines) : `<p class="empty">${esc(ad.medicine_note || "No suggestions.")}</p>`}
+     <h3>Doctor's trend in this clinic${tr.records ? ` (${tr.records} similar record${tr.records === 1 ? "" : "s"})` : ""}</h3>${trendRows}
+     ${appr ? `<h3>How the doctor approached similar cases</h3>${appr}` : ""}`;
+
+  // Column 2: similar patients in this clinic
+  const caseCard = c => `<div class="past"><b>${esc(c.patient_name)}</b> · ${esc((c.created_at || "").slice(0,10))}<small>Diagnosis: ${esc(c.diagnosis)}</small><small>Medicines given: ${esc(medNames(c.medicines))}</small>${c.doctor_approach ? `<small>Approach: ${esc(c.doctor_approach)}</small>` : ""}</div>`;
+  const hist = (res.patient_history || []).map(caseCard).join("");
+  const similar = (res.similar_cases || []).map(caseCard).join("") || `<p class="empty">No similar patient in your records yet.</p>`;
+  $("c2").innerHTML = (hist ? `<h3>Earlier visits of this patient</h3>${hist}` : "") + `<h3>Patients with similar problems</h3>${similar}`;
+
+  // Column 3: diagnosis plan
+  const msg = { sufficient: ["ok", "Evidence found for every question."], partial: ["warn", "Some evidence was weak. Verify carefully."], insufficient: ["bad", "Not enough evidence was found. Treat everything here as unverified."] }[res.confidence] || ["warn", ""];
+  const banner = `<div class="banner ${msg[0]}">${esc(msg[1])}${(res.warnings || []).length ? `<ul>${res.warnings.map(w => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}</div>`;
+  const used = (res.evidence || []).filter(e => e.relevant);
+  const sources = used.length ? used.map(e => `<p class="src"><b>${esc(e.id)}</b> ${esc(e.source)} ${esc(e.page_label)}<br>${esc(e.snippet)}</p>`).join("") : `<p class="empty">No relevant passages.</p>`;
+  const label = { sufficient: "evidence found", insufficient: "weak evidence", no_source: "no data source", none_found: "nothing on file", pending: "pending" };
+  const ag = res.agent || { questions: [], metrics: {}, steps: [] }, m = ag.metrics || {};
+  const steps = ag.questions.map(q => `<div class="qrow"><b>${esc(q.id)}</b> ${esc(q.question)}<br><small>${esc(q.tool)} · ${esc(label[q.status] || q.status)} · ${q.relevant}/${q.retrieved} passages relevant${q.rewrites ? " · query rewritten" : ""}</small></div>`).join("");
+
+  $("c3").innerHTML = banner +
+    `<h3>Activities</h3>${items(ad.activity)}
+     <h3>Diet</h3>${items(ad.diet)}
+     <h3>Lifestyle changes</h3>${items(ad.lifestyle)}
+     <h3>Medicines that might be needed</h3>${medCards(ad.possible_medicines)}
+     <h3>Follow-up for the next meeting</h3>${items(ad.follow_up)}
+     <h3>Diagnosis considerations</h3>${items(ad.diagnosis_considerations)}
+     <p class="note">Chips like E1 point to a source passage. "unverified" means no retrieved source supports that line.</p>
+     <details class="sub"><summary>Sources (${used.length})</summary>${sources}</details>
+     <details class="sub"><summary>How the agent worked (${ag.rounds} retrieval round${ag.rounds === 1 ? "" : "s"})</summary>${steps}
+       <p class="src">Retrieval precision: ${m.retrieval_precision ?? "n/a"} · Suggestions backed by evidence: ${m.grounded_items ?? 0}/${m.total_items ?? 0}</p></details>`;
+}
+
+// ---------- Diabetes prediction ----------
+const LIK = { high: ["High", 85], moderate: ["Moderate", 55], low: ["Low", 25] };
+const ROUTINE = { diet: "Diet", activity: "Activity", sleep: "Sleep", family_history: "Family history", other: "Other" };
+
+function predBlock(p) {
+  return predBlockInner(p || {});
+}
+function predBlockInner(p) {
+  const st = {
+    complete: ["ok", "The patient described their symptoms and routine, so the agent screened for diabetes. This is a guide for the doctor, not a diagnosis."],
+    preliminary: ["warn", "Preliminary screen: the patient has only partly described symptoms or routine. See \"Still to ask\" below."],
+    insufficient: ["bad", "Not enough symptoms or routine were described to predict diabetes yet. See \"Still to ask\" below."],
+  }[p.status] || ["warn", ""];
+  const flags = (p.red_flags || []).length ? `<div class="banner bad"><b>Urgent:</b><ul>${p.red_flags.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>` : "";
+
+  const types = (p.possible_types || []).map(t => { const [name, pct] = LIK[t.likelihood] || LIK.low;
+    return `<div class="type"><div class="head"><span>${esc(t.type)}</span><span>${name}</span></div>
+      <div class="bar ${esc(t.likelihood)}"><i style="width:${pct}%"></i></div>
+      ${(t.reasons || []).length ? `<small>Fits: ${t.reasons.map(esc).join("; ")}</small>` : ""}
+      ${(t.against || []).length ? `<small>Against or unknown: ${t.against.map(esc).join("; ")}</small>` : ""}</div>`; }).join("")
+    || `<p class="empty">No type can be suggested yet.</p>`;
+
+  const syms = (p.symptoms || []).map(s => `<li>${esc(s.symptom)}${s.source === "keyword" ? ` <span class="chip amber" title="Found by a keyword check, not by the language model">keyword</span>` : ""}${s.heard === false ? ` <span class="chip warn" title="The quoted words were not found clearly in the transcript">not heard clearly</span>` : ""}${s.quote ? `<br><span class="quote">“${esc(s.quote)}”</span>` : ""}</li>`).join("");
+  const routine = `<dl class="routine">${Object.entries(ROUTINE).map(([k, l]) => `<dt>${l}</dt><dd>${esc((p.routine || {})[k] || "Not mentioned")}</dd>`).join("")}</dl>`;
+  const risks = (p.risk_factors || []).length ? `<ul>${p.risk_factors.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : `<p class="empty">None picked up.</p>`;
+
+  const tests = (p.tests || []).length
+    ? `<div class="scroll"><table class="small"><thead><tr><th>Test to confirm</th><th>Why</th></tr></thead><tbody>${p.tests.map(t => `<tr><td>${esc(t.test)}</td><td>${esc(t.why)}</td></tr>`).join("")}</tbody></table></div>`
+    : `<p class="empty">Tests appear once there is enough information.</p>`;
+  const missing = (p.missing_info || []).length ? `<h3>Still to ask the patient</h3><ul>${p.missing_info.map(q => `<li>${esc(q)}</li>`).join("")}</ul>` : "";
+  const crit = (p.criteria || []).length
+    ? `<details class="sub"><summary>Diagnostic thresholds</summary><div class="scroll"><table class="small"><thead><tr><th>Test</th><th>Diabetes</th><th>Prediabetes</th></tr></thead><tbody>${p.criteria.map(c => `<tr><td>${esc(c.test)}</td><td>${esc(c.diabetes)}</td><td>${esc(c.prediabetes)}</td></tr>`).join("")}</tbody></table></div><p class="note">${esc(p.criteria_note)}</p></details>` : "";
+
+  return `<div class="banner ${st[0]}">${esc(st[1])}</div>${flags}
+    ${p.summary ? `<p>${esc(p.summary)}</p>` : ""}
+    <div class="pred-grid">
+      <div><h3>Possible types</h3>${types}</div>
+      <div><h3>Symptoms the patient described</h3>${syms ? `<ul>${syms}</ul>` : `<p class="empty">None described.</p>`}
+        <h3>Daily routine and history</h3>${routine}
+        <h3>Risk factors noticed</h3>${risks}</div>
+    </div>
+    <h3>Tests required to confirm or rule it out</h3>${tests}${missing}${crit}`;
+}
+function renderPrediction(p) { $("pred").innerHTML = predBlock(p); }
+
+// ---------- Save ----------
+$("save").onclick = async () => {
+  let name = $("patient").value.trim();
+  if (!name && isFast()) name = "Unnamed patient";
+  if (!name) { $("patient").focus(); toast("Enter the patient name first"); return; }
+  const ex = current.extracted, fd = new FormData();
+  fd.append("patient_name", name); fd.append("diagnosis", ex.diagnosis); fd.append("mode", MODE);
+  fd.append("medicines", JSON.stringify(ex.medicines || [])); fd.append("vitals", ex.vitals || "");
+  fd.append("doctor_approach", ex.doctor_approach || ""); fd.append("transcript", current.transcript);
+  fd.append("dialogue", JSON.stringify(ex.dialogue || []));
+  fd.append("prediction", JSON.stringify(current.prediction || {}));
+  const sh = getSheet();     // save the reviewed version so the records learn from corrected data (all modes)
+  fd.append("sheet", JSON.stringify(sh));
+  if (sh.diagnosis) fd.set("diagnosis", sh.diagnosis);
+  if (sh.medicines.length) fd.set("medicines", JSON.stringify(sh.medicines.map(m => ({ name: m.name, dosage: m.dose, status: "prescribed" }))));
+  if (MODE !== "lifestyle" && current.guidance) {
+    fd.set("doctor_approach", [current.guidance.summary, ...(current.guidance.steps || []).slice(0, 3).map(s => s.text)].filter(Boolean).join(" "));
+  }
+  const r = await fetch("/records", { method: "POST", body: fd });
+  if (r.ok) {
+    const j = await r.json();
+    toast(j.indexed ? "Saved to records and search index" : "Saved, but the search index failed. Check the server log.");
+    $("save").disabled = true;
+  } else toast("Could not save");
+};
+
+// ---------- Records ----------
+async function loadRecords() {
+  const data = await (await fetch("/records?q=" + encodeURIComponent($("search").value) + "&mode=" + encodeURIComponent($("rmode").value))).json();
+  const label = id => (CFG.modes.find(m => m.id === id) || { label: id || "Lifestyle disease" }).label;
+  $("rows").innerHTML = data.length ? data.map(r => {
+    const types = ((r.prediction || {}).possible_types || []).map(t => `${esc(t.type)} (${esc(t.likelihood)})`).join(", ");
+    return `
+    <tr class="row" data-id="${r.id}"><td>${esc(r.created_at.replace("T", " "))}</td><td>${esc(r.patient_name)}<br><span class="chip mode">${esc(label(r.mode))}</span></td><td>${esc(r.diagnosis)}</td><td>${esc(medNames(r.medicines))}</td></tr>
+    <tr class="detail" id="d${r.id}" hidden><td colspan="4">
+      <b>Approach:</b> ${esc(r.doctor_approach)}<br><b>Vitals:</b> ${esc(r.vitals)}
+      ${types ? `<br><b>Screening result:</b> ${types}` : ""}
+      ${((r.prediction || {}).tests || []).length ? `<br><b>Tests suggested:</b> ${r.prediction.tests.map(t => esc(t.test)).join("; ")}` : ""}
+      <details class="sub"><summary>Conversation</summary><div class="convo">${bubbles(r.dialogue) || `<p>${esc(r.transcript)}</p>`}</div></details>
+      <p class="mt-2 flex flex-wrap gap-2"><a class="btn ghost" href="/records/${r.id}/sheet.pdf">Download care sheet</a> <button class="btn ghost" data-del="${r.id}">Delete record</button></p></td></tr>`; }).join("")
+    : `<tr><td colspan="4" class="empty">No records yet. Save a consultation to start your record book.</td></tr>`;
+}
+$("rows").onclick = async e => {
+  const del = e.target.dataset.del;
+  if (del) { if (confirm("Delete this record permanently?")) { await fetch("/records/" + del, { method: "DELETE" }); loadRecords(); } return; }
+  const tr = e.target.closest("tr.row"); if (tr) { const d = $("d" + tr.dataset.id); d.hidden = !d.hidden; }
+};
+$("search").oninput = loadRecords; $("rmode").onchange = loadRecords;
+
+// ---------- Patient sheet ----------
+function medRow(m = {}) {
+  const d = document.createElement("div"); d.className = "medrow";
+  d.innerHTML = `<input type="text" placeholder="Medicine" value="${esc(m.name)}"><input type="text" placeholder="Dose" value="${esc(m.dose)}"><input type="text" placeholder="How and when to take" value="${esc(m.how_to_take)}"><input type="text" placeholder="For how long" value="${esc(m.duration)}"><button type="button" class="x" aria-label="Remove medicine">×</button>`;
+  d.querySelector(".x").onclick = () => d.remove();
+  $("meds").appendChild(d);
+}
+const LIFE = ["diet", "exercise", "monitoring", "other"];
+const SHLBL = { lifestyle: ["Food and drink", "Activity", "Checks to do at home", "Other advice"], other: ["What to do", "Do not", "Get help straight away if", "Also noted"] };
+const isLife = () => MODE === "lifestyle";
+function sheetLabels() {
+  const L = SHLBL[isLife() ? "lifestyle" : "other"];
+  LIFE.forEach((k, i) => $("lb_" + k).textContent = L[i]);
+  $("sh_h3").textContent = isLife() ? "Lifestyle advice from the doctor (one item per line)" : "Advice to give the patient (one item per line)";
+  $("sh_note").textContent = isLife() ? "Built only from what the doctor said. Check and correct anything before giving it to the patient."
+    : "Built from the steps above and what was said. Check and correct anything before giving it to the patient.";
+}
+const lines2 = a => (a || []).map(x => String((x && x.text) ?? x));
+function autoSheet(res) {      // care sheet for emergency, critical care and childbirth, from the guidance
+  const g = res.guidance || {}, ex = res.extracted || {}, dx = String(ex.diagnosis || "");
+  return { diagnosis: dx && !/^not (mentioned|stated)/i.test(dx) ? dx : (g.headline || ""), summary: g.summary || "", follow_up: "",
+    medicines: (ex.medicines || []).map(m => ({ name: m.name, dose: m.dosage && m.dosage !== "Not mentioned" ? m.dosage : "", how_to_take: "", duration: "" })),
+    lifestyle: { diet: lines2(g.steps), exercise: lines2(g.avoid), monitoring: lines2(g.escalate), other: lines2(g.notes) } };
+}
+function protoSheet(list) {    // same sheet from the built-in steps when the AI is offline
+  const p = list[0] || {};
+  return { diagnosis: p.title || "", summary: p.headline || "", follow_up: "", medicines: [],
+    lifestyle: { diet: lines2(p.steps), exercise: lines2(p.avoid), monitoring: lines2(p.signs), other: lines2(p.tell) } };
+}
+function renderSheet(s, warns) {
+  s = s || {}; $("sheetbox").hidden = false; sheetLabels();
+  $("sh_warn").innerHTML = (warns || []).length ? `<div class="banner warn"><b>Check against what was said:</b><ul>${warns.map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>` : "";
+  $("sh_dx").value = s.diagnosis || ""; $("sh_sum").value = s.summary || ""; $("sh_fu").value = s.follow_up || "";
+  $("meds").innerHTML = ""; (s.medicines || []).forEach(medRow);
+  LIFE.forEach(k => $("sh_" + k).value = ((s.lifestyle || {})[k] || []).join("\n"));
+}
+function getSheet() {
+  const lines = id => $(id).value.split("\n").map(x => x.trim()).filter(Boolean);
+  const out = {
+    diagnosis: $("sh_dx").value.trim(), summary: $("sh_sum").value.trim(), follow_up: $("sh_fu").value.trim(),
+    medicines: [...document.querySelectorAll("#meds .medrow")].map(r => { const i = r.querySelectorAll("input"); return { name: i[0].value.trim(), dose: i[1].value.trim(), how_to_take: i[2].value.trim(), duration: i[3].value.trim() }; }).filter(m => m.name),
+    lifestyle: Object.fromEntries(LIFE.map(k => [k, lines("sh_" + k)]))
+  };
+  if (!isLife()) { out.plan_title = "What to do now"; out.plan = LIFE.map((k, i) => ({ title: SHLBL.other[i], items: out.lifestyle[k] })); }
+  return out;
+}
+async function sheetPdf() {
+  const fd = new FormData();
+  fd.append("patient_name", $("patient").value.trim() || "Patient");
+  fd.append("doctor_name", $("doctor").value.trim());
+  fd.append("sheet", JSON.stringify(getSheet()));
+  const r = await fetch("/sheet/pdf", { method: "POST", body: fd });
+  if (!r.ok) throw new Error("Could not create the PDF");
+  return r.blob();
+}
+const pdfName = () => `care-sheet-${($("patient").value.trim() || "patient").replace(/\W+/g, "-")}.pdf`;
+$("addmed").onclick = () => medRow();
+$("dl").onclick = async () => { try { const a = document.createElement("a"); a.href = URL.createObjectURL(await sheetPdf()); a.download = pdfName(); a.click(); } catch (e) { toast(e.message); } };
+$("pr").onclick = async () => { try { window.open(URL.createObjectURL(await sheetPdf())); } catch (e) { toast(e.message); } };
+$("sh").onclick = async () => {
+  try {
+    const f = new File([await sheetPdf()], pdfName(), { type: "application/pdf" });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) await navigator.share({ files: [f], title: "Your care sheet" });
+    else { $("dl").click(); toast("Downloaded. Attach the PDF in WhatsApp or email to share it."); }
+  } catch (e) { if (e.name !== "AbortError") toast(e.message); }
+};
+
+function tab(n) {
+  $("view1").hidden = n !== 1; $("view2").hidden = n !== 2;
+  document.querySelectorAll("[data-view]").forEach(b => b.classList.toggle("on", +b.dataset.view === n));
+  window.scrollTo({ top: 0 });
+  if (n === 2) loadRecords();
+}
+document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => tab(+b.dataset.view));
+
+// ---------- start ----------
+(async () => {
+  try { CFG = await (await fetch("/modes")).json(); } catch { toast("Could not reach the server"); }
+  buildTabs(); setCalls();
+  setMode((location.hash || "").slice(1) || CFG.default);   // /#emergency opens straight into emergency mode
+})();
+window.addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id && id !== MODE) setMode(id); });
+</script>
+</body>
+</html>
