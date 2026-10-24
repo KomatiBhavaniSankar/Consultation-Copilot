@@ -2,6 +2,8 @@
 
 Drop PDFs / .md / .txt / .html / .json into a folder and run `python -m app.ingest`
 (or restart the server, or POST /kb/reindex). Only new or changed files are embedded.
+
+Embeddings: Gemini (needs GOOGLE_API_KEY).
 """
 import hashlib
 import json
@@ -12,7 +14,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.modes import DOMAINS, MODES, case_collection
@@ -20,17 +22,21 @@ from app.modes import DOMAINS, MODES, case_collection
 BASE_DIR = Path(__file__).resolve().parent.parent
 KNOWLEDGE_DIR = Path(os.getenv("KNOWLEDGE_DIR", BASE_DIR / "knowledge"))
 DB_DIR = os.getenv("DB_DIR", str(BASE_DIR / "chroma_db"))
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "gemini-embedding-001")
+if not EMBEDDING_MODEL.startswith("models/"):
+    EMBEDDING_MODEL = f"models/{EMBEDDING_MODEL}"
 RETRIEVAL_K = int(os.getenv("RETRIEVAL_K", "4"))
 MANIFEST = Path(DB_DIR) / "ingest_manifest.json"
 TEXT_EXT = {".txt", ".md", ".json"}
 HTML_EXT = {".html", ".htm"}
 
-print("Loading local embeddings...")
-embeddings = HuggingFaceEmbeddings(
-    model_name=EMBEDDING_MODEL,
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True},
+if not os.getenv("GOOGLE_API_KEY"):
+    raise RuntimeError("GOOGLE_API_KEY is not set. It is required for Gemini embeddings.")
+
+print("Loading Gemini embeddings...")
+embeddings = GoogleGenerativeAIEmbeddings(
+    model=EMBEDDING_MODEL,
+    google_api_key=os.environ["GOOGLE_API_KEY"],
 )
 
 kb_stores = {d: Chroma(collection_name=c["collection"], embedding_function=embeddings, persist_directory=DB_DIR)
@@ -49,8 +55,13 @@ def _simple(meta: dict) -> dict:
 def load_file(path: Path) -> list:
     ext = path.suffix.lower()
     if ext == ".pdf":
-        from langchain_community.document_loaders import PyPDFLoader
-        return PyPDFLoader(str(path)).load()
+        from pypdf import PdfReader
+        docs = []
+        for i, page in enumerate(PdfReader(str(path)).pages):
+            text = page.extract_text() or ""
+            if text.strip():
+                docs.append(Document(page_content=text, metadata={"source": str(path), "page": i}))
+        return docs
     raw = path.read_text(encoding="utf-8", errors="ignore")
     if ext in HTML_EXT:
         soup = BeautifulSoup(raw, "html.parser")
@@ -125,8 +136,17 @@ def ingest_domain(domain: str, rebuild: bool = False) -> dict:
         for i, c in enumerate(chunks):
             c.metadata = {**_simple(c.metadata), "domain": domain, "source_path": rel, "chunk": i}
         ids = [f"{domain}:{digest[:12]}:{i}" for i in range(len(chunks))]
-        for i in range(0, len(chunks), 64):
-            store.add_documents(chunks[i:i + 64], ids=ids[i:i + 64])
+        try:
+            for i in range(0, len(chunks), 64):
+                store.add_documents(chunks[i:i + 64], ids=ids[i:i + 64])
+        except Exception as error:                   # e.g. Gemini rate limit: skip this file, retry on next start
+            print(f"  ! could not embed {rel}: {type(error).__name__}: {str(error)[:200]}")
+            try:
+                store.delete(where={"source_path": rel})   # remove partial chunks so a retry starts clean
+            except Exception:
+                pass
+            seen.pop(rel, None)
+            continue
         report["updated" if rel in seen else "added"].append(rel)
         report["chunks"] += len(chunks)
         seen[rel] = digest
